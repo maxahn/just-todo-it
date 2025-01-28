@@ -20,25 +20,25 @@ export default function TabLayout() {
       }}
     >
       <Tabs.Screen
-        name="index"
+        name="tasks"
         options={{
-          title: "Expo V3",
-          tabBarIcon: ({ color }) => <TabBarIcon name="home" color={color} />,
+          title: "Tasks",
+          tabBarIcon: ({ color }) => <TabBarIcon name="list" color={color} />,
         }}
       />
 
       <Tabs.Screen
-        name="tab1"
+        name="index"
         options={{
-          title: "Tab 1",
-          tabBarIcon: ({ color }) => <TabBarIcon name="star-o" color={color} />,
+          title: "Active Mission",
+          tabBarIcon: ({ color }) => <TabBarIcon name="bullseye" color={color} />,
         }}
       />
       <Tabs.Screen
-        name="tab2"
+        name="player"
         options={{
-          title: "Tab 2",
-          tabBarIcon: ({ color }) => <TabBarIcon name="star-o" color={color} />,
+          title: "Player",
+          tabBarIcon: ({ color }) => <TabBarIcon name="user" color={color} />,
         }}
       />
     </Tabs>
