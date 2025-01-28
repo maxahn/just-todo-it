@@ -31,7 +31,9 @@ export default function TabLayout() {
         name="index"
         options={{
           title: "Active Mission",
-          tabBarIcon: ({ color }) => <TabBarIcon name="bullseye" color={color} />,
+          tabBarIcon: ({ color }) => (
+            <TabBarIcon name="bullseye" color={color} />
+          ),
         }}
       />
       <Tabs.Screen
