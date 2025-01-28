@@ -1,5 +1,4 @@
 import React from "react";
-import { QueryClient, QueryClientProvider } from "react-query";
 import Gradient from "@/assets/Icons/Gradient";
 import DocumentData from "@/assets/Icons/DocumentData";
 import LightBulbPerson from "@/assets/Icons/LightbulbPerson";
@@ -11,7 +10,6 @@ import { Text } from "@/components/ui/text";
 
 import { Link } from "expo-router";
 
-const queryClient = new QueryClient();
 
 const FeatureCard = ({ iconSvg: IconSvg, name, desc }: any) => {
   return (
@@ -34,7 +32,6 @@ const FeatureCard = ({ iconSvg: IconSvg, name, desc }: any) => {
 
 export default function Home() {
   return (
-    <QueryClientProvider client={queryClient}>
       <Box className="flex-1 bg-black h-[100vh]">
         <ScrollView
           style={{ height: "100%" }}
@@ -85,6 +82,5 @@ export default function Home() {
           </Box>
         </ScrollView>
       </Box>
-    </QueryClientProvider>
   );
 }

@@ -1,16 +1,17 @@
-import EditScreenInfo from "@/components/EditScreenInfo";
+import React from "react";
+import { FlatList } from "react-native";
 import { Center } from "@/components/ui/center";
-import { Divider } from "@/components/ui/divider";
-import { Heading } from "@/components/ui/heading";
 import { Text } from "@/components/ui/text";
+import useTasksQuery from "@/hooks/useTasksQuery";
+import { Spinner } from "@/components/ui/spinner";
 
 export default function Home() {
+  const { data, isLoading } = useTasksQuery();
   return (
     <Center className="flex-1">
-      <Heading className="font-bold text-2xl">Tasks</Heading>
-      <Divider className="my-[30px] w-[80%]" />
-      <Text className="p-4">Example below to use gluestack-ui components.</Text>
-      <EditScreenInfo path="app/(app)/(tabs)/index.tsx" />
+      {isLoading ? (<Spinner />) :
+      <FlatList style={{width: '100%'}} data={data} renderItem={({item: task}) => <Text key={task.id}>{task.content}</Text>} />
+      }
     </Center>
   );
 }
