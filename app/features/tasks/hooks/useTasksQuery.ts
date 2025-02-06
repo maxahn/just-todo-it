@@ -1,4 +1,5 @@
 import { useQuery } from '@tanstack/react-query'
+import { Task } from '../types'
 
 const useTasksQuery = () => useQuery({
     queryKey: ['tasks'],
@@ -8,11 +9,10 @@ const useTasksQuery = () => useQuery({
                 Authorization: `Bearer ${process.env.EXPO_PUBLIC_TODOIST_API_KEY}`
             }
         }) 
-        console.log({response, TODOIST_API_KEY: process.env.EXPO_PUBLIC_TODOIST_API_KEY})
         if (!response.ok) {
             throw new Error('Network response was not ok')
         }
-        return response.json()
+        return response.json() as Promise<Task[]>
     }
 })
 
