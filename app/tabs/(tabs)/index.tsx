@@ -7,34 +7,24 @@ import { Text } from "@/components/ui/text";
 import { useEffect, useState } from "react";
 import { Task } from "@/app/features/tasks/types";
 import { View } from "@/components/ui/view";
+import { sortByDueDateAndPriority } from "@/app/features/tasks/utils/sortTasks";
+import { useActiveMission } from "@/app/features/tasks/hooks/useActiveMission";
 
 export default function Home() {
   const { data: tasks, isLoading } = useTasksQuery();
+  const { activeMission, setActiveMission } = useActiveMission();
   const [activeTask, setActiveTask] = useState<Task | null>(null);
 
-  useEffect(() => {
-    if (!tasks || !tasks.length) {
+  function initializeActiveMission() {
+    if (!tasks || !tasks.length || activeMission) {
       return;
     }
-    const sortedTasks = tasks.sort((a, b) => {
-      const aDue = a.due;
-      const bDue = b.due;
-      if (!aDue && !bDue) {
-        return a.priority > b.order ? -1 : 1;
-      }
-      const aDueDatetime = aDue?.date;
-      const bDueDatetime = bDue?.date;
-      if (aDueDatetime && bDueDatetime) {
-        return aDueDatetime > bDueDatetime ? -1 : 1;
-      }
-      if (aDueDatetime) {
-        return -1;
-      }
-      return 1;
-    });
+    const sortedTasks = sortByDueDateAndPriority(tasks);
+    setActiveMission(sortedTasks[0]);
+  }
 
-    console.log({ tasks, sortedTasks });
-    setActiveTask(sortedTasks[0]);
+  useEffect(() => {
+    initializeActiveMission();
   }, [tasks]);
 
   return (

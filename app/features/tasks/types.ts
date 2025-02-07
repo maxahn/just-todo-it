@@ -20,7 +20,7 @@ export type Task = {
   } | null;
   duration: {
     amount: number;
-    unit: string; // "minute"
+    unit: "minute" | "day"; // "minute"
   } | null;
   labels: string[]; // ["Food", "Shopping"],
   order: number;
