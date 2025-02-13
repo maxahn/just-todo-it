@@ -25,6 +25,12 @@ export default function Home() {
               <Text>{task.content}</Text>
               <Text>{task.due?.date || ""}</Text>
               <Text>{task.priority || ""}</Text>
+              <Text>
+                Duration:{" "}
+                {task.duration
+                  ? `${task.duration.amount}${task.duration.unit}`
+                  : "None"}
+              </Text>
             </Card>
           )}
         />

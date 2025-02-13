@@ -21,6 +21,8 @@ type MissionTaskProps = {
   } | null;
   anxietyLevel?: number;
   difficultyLevel?: number;
+  onIncrementDuration: () => Promise<void> | undefined;
+  onDecrementDuration: () => Promise<void> | undefined;
 };
 
 export function MissionTask({
@@ -28,6 +30,8 @@ export function MissionTask({
   description,
   due,
   duration,
+  onIncrementDuration,
+  onDecrementDuration,
   anxietyLevel,
   difficultyLevel,
 }: MissionTaskProps) {
@@ -42,13 +46,13 @@ export function MissionTask({
       <HStack className="justify-between items-center">
         <Text>Time Estimation</Text>
         <HStack className="gap-2 items-center">
-          <Button className="rounded-full w-1">
+          <Button className="rounded-full w-1" onPress={onDecrementDuration}>
             <ButtonIcon as={RemoveIcon} />
           </Button>
           <Text>
             {duration ? `${duration.amount} ${duration.unit}` : "25m"}
           </Text>
-          <Button className="rounded-full w-1">
+          <Button className="rounded-full w-1" onPress={onIncrementDuration}>
             <ButtonIcon as={AddIcon} />
           </Button>
         </HStack>
