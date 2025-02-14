@@ -1,9 +1,8 @@
-import _ from "lodash";
+// import _ from "lodash";
 import { MissionTask } from "@/app/features/tasks/components/MissionTask";
 import useTasksQuery from "@/app/features/tasks/hooks/useTasksQuery";
 import { Text } from "@/components/ui/text";
-import { useEffect, useState } from "react";
-import { Task } from "@/app/features/tasks/types";
+import { useEffect } from "react";
 import { View } from "@/components/ui/view";
 import { sortByDueDateAndPriority } from "@/app/features/tasks/utils/sortTasks";
 import { useActiveMission } from "@/app/features/tasks/hooks/useActiveMission";
@@ -15,24 +14,32 @@ export default function Home() {
   const { mutateAsync: updateTask } = useTaskMutation();
 
   async function handleIncrementDuration(amount: number) {
+    const oldActiveMission = activeMission;
     try {
       if (!activeMission) return;
-      console.log({ activeMissionDuration: activeMission?.duration?.amount });
       const updatedDuration = (activeMission?.duration?.amount || 25) + amount;
-      const updatedMission = await updateTask({
+      setActiveMission({
+        ...activeMission,
+        duration: {
+          amount: updatedDuration,
+          unit: activeMission?.duration?.unit || "minute",
+        },
+      });
+      await updateTask({
         id: activeMission.id,
         taskChange: {
           duration: updatedDuration,
           duration_unit: "minute",
         },
       });
-      setActiveMission(updatedMission);
+      // setActiveMission(updatedMission);
     } catch (error) {
       console.log({ error });
+      setActiveMission(oldActiveMission);
     }
   }
 
-  const debouncedIncrementDuration = _.debounce(handleIncrementDuration, 500);
+  // const debouncedIncrementDuration = _.debounce(handleIncrementDuration, 500);
 
   function initializeActiveMission() {
     if (!tasks || !tasks.length || activeMission) {
@@ -54,8 +61,8 @@ export default function Home() {
           description={activeMission?.description}
           due={activeMission.due}
           duration={activeMission?.duration}
-          onDecrementDuration={() => debouncedIncrementDuration(-5)}
-          onIncrementDuration={() => debouncedIncrementDuration(5)}
+          onDecrementDuration={() => handleIncrementDuration(-5)}
+          onIncrementDuration={() => handleIncrementDuration(5)}
         />
       ) : (
         <Text>No tasks</Text>

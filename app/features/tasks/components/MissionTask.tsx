@@ -1,9 +1,8 @@
-import { Button, ButtonIcon } from "@/components/ui/button";
+import { Button, ButtonIcon, ButtonText } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { HStack } from "@/components/ui/hstack";
-import { AddIcon, Icon, RemoveIcon } from "@/components/ui/icon";
+import { AddIcon, RemoveIcon, ChevronsRightIcon } from "@/components/ui/icon";
 import { Text } from "@/components/ui/text";
-import FontAwesome from "@expo/vector-icons/FontAwesome";
 
 type MissionTaskProps = {
   title: string;
@@ -35,13 +34,18 @@ export function MissionTask({
   anxietyLevel,
   difficultyLevel,
 }: MissionTaskProps) {
+  console.log({ date: due?.date });
   return (
     <Card className="rounded-xl p-6 gap-4">
       <Text className="text-2xl font-bold">Current Mission</Text>
       <Card className="rounded-xl p-6 mt-3 bg-blue-100">
         <Text className="text-xl font-bold">{title}</Text>
         {description ? <Text className="text-lg">{description}</Text> : null}
-        {due ? <Text className="text-lg">{due?.datetime}</Text> : null}
+        {due ? (
+          <Text className="text-lg text-right font-bold mt-2">
+            {due.string || due.datetime || due.date}
+          </Text>
+        ) : null}
       </Card>
       <HStack className="justify-between items-center">
         <Text>Time Estimation</Text>
@@ -56,6 +60,14 @@ export function MissionTask({
             <ButtonIcon as={AddIcon} />
           </Button>
         </HStack>
+      </HStack>
+      <HStack className="flex gap-2">
+        <Button size="lg" className="flex-1" action="positive">
+          <ButtonText>Start Task</ButtonText>
+        </Button>
+        <Button size="lg" action="secondary">
+          <ButtonIcon as={ChevronsRightIcon} />
+        </Button>
       </HStack>
     </Card>
   );
