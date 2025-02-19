@@ -20,6 +20,7 @@ type MissionTaskProps = {
   } | null;
   anxietyLevel?: number;
   difficultyLevel?: number;
+  onStart: () => void;
   onIncrementDuration: () => Promise<void> | undefined;
   onDecrementDuration: () => Promise<void> | undefined;
 };
@@ -31,10 +32,10 @@ export function MissionTask({
   duration,
   onIncrementDuration,
   onDecrementDuration,
+  onStart,
   anxietyLevel,
   difficultyLevel,
 }: MissionTaskProps) {
-  console.log({ date: due?.date });
   return (
     <Card className="rounded-xl p-6 gap-4">
       <Text className="text-2xl font-bold">Current Mission</Text>
@@ -62,7 +63,12 @@ export function MissionTask({
         </HStack>
       </HStack>
       <HStack className="flex gap-2">
-        <Button size="lg" className="flex-1" action="positive">
+        <Button
+          size="lg"
+          className="flex-1"
+          action="positive"
+          onPress={onStart}
+        >
           <ButtonText>Start Task</ButtonText>
         </Button>
         <Button size="lg" action="secondary">
