@@ -7,8 +7,10 @@ import { parseISO } from "date-fns/parseISO";
 type Session = [string, string | null]; // start and end timestamp, if null, not ended
 interface ActiveMissionState {
   activeMission: Task | null;
+  distractionCounter: number;
+  setDistractionCounter: (distractionCounter: number) => void;
   setActiveMission: (mission: Task) => void;
-  clearActiveMission: () => void;
+  clearSessions: () => void;
   getIsActive: () => boolean;
   sessions: Session[];
   toggleIsTaskPaused: () => void;
@@ -26,7 +28,6 @@ function sumSessionsDurationMS(sessions: Session[]): number {
     const workingEnd = end || new Date().toISOString();
     const msDuration =
       parseISO(workingEnd).getTime() - parseISO(start).getTime();
-    console.log({ msDuration });
     return acc + msDuration;
   }, 0);
 }
@@ -36,6 +37,10 @@ export const useActiveMission = create(
     (set, get) => ({
       activeMission: null,
       sessions: [],
+      distractionCounter: 0,
+      setDistractionCounter: (distractionCounter) => {
+        set((state) => ({ ...state, distractionCounter }));
+      },
       getIsActive: () => {
         const sessions = get().sessions;
         return getIsActive(sessions);
@@ -44,7 +49,7 @@ export const useActiveMission = create(
         const sessions = get().sessions;
         return Math.floor(sumSessionsDurationMS(sessions) / 1000);
       },
-      clearActiveMission: () => set({ activeMission: null, sessions: [] }),
+      clearSessions: () => set((state) => ({ ...state, sessions: [] })),
       removeSession: (index) => {
         set((state) => {
           const sessions = state.sessions;

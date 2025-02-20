@@ -20,6 +20,8 @@ type MissionTaskProps = {
   } | null;
   anxietyLevel?: number;
   difficultyLevel?: number;
+  onStart: () => void;
+  onDefer: () => void;
   onIncrementDuration: () => Promise<void> | undefined;
   onDecrementDuration: () => Promise<void> | undefined;
 };
@@ -31,13 +33,20 @@ export function MissionTask({
   duration,
   onIncrementDuration,
   onDecrementDuration,
+  onStart,
+  onDefer,
   anxietyLevel,
   difficultyLevel,
 }: MissionTaskProps) {
   return (
     <Card className="rounded-xl p-6 gap-4">
-      <Text className="text-2xl font-bold">Current Mission</Text>
-      <Card className="rounded-xl p-6 mt-3 bg-blue-100">
+      <HStack className="justify-between items-center">
+        <Text className="text-2xl font-bold">Current Task</Text>
+        {/* <Button size="lg" action="positive" variant="outline">
+          <ButtonText className="0">Complete</ButtonText>
+        </Button> */}
+      </HStack>
+      <Card className="rounded-xl p-6 mt-3">
         <Text className="text-xl font-bold">{title}</Text>
         {description ? <Text className="text-lg">{description}</Text> : null}
         {due ? (
@@ -61,10 +70,15 @@ export function MissionTask({
         </HStack>
       </HStack>
       <HStack className="flex gap-2">
-        <Button size="lg" className="flex-1" action="positive">
+        <Button
+          size="lg"
+          className="flex-1"
+          action="positive"
+          onPress={onStart}
+        >
           <ButtonText>Start Task</ButtonText>
         </Button>
-        <Button size="lg" action="secondary">
+        <Button size="lg" action="secondary" onPress={onDefer}>
           <ButtonIcon as={ChevronsRightIcon} />
         </Button>
       </HStack>

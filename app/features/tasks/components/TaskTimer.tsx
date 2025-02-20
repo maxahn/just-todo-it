@@ -17,11 +17,14 @@ import { formatSession, secondsToFormattedTime } from "../utils/formatTime";
 import { parseISO } from "date-fns";
 import Animated, { LinearTransition } from "react-native-reanimated";
 import { useCompleteTaskMutation } from "../hooks/useCompleteTaskMutation";
+import { storeData } from "@/app/util/localStorage/setData";
+import { useQueryClient } from "@tanstack/react-query";
 
 export default function TaskTimer() {
   const [sessionsVisible, setSessionsVisible] = useState(false);
   const { mutateAsync: completeTask, isPending: isCompleting } =
     useCompleteTaskMutation();
+  const queryClient = useQueryClient();
   const {
     activeMission,
     sessions,
@@ -29,7 +32,7 @@ export default function TaskTimer() {
     toggleIsTaskPaused,
     getTotalSessionsDuration,
     removeSession,
-    clearActiveMission,
+    clearSessions,
   } = useActiveMission();
   const estimatedSeconds = activeMission?.duration?.amount
     ? activeMission.duration.amount * 60
@@ -37,14 +40,20 @@ export default function TaskTimer() {
   const [secondsRemaining, setSecondsRemaining] = useState(estimatedSeconds);
   const totalSessionsDuration = getTotalSessionsDuration();
 
-  console.log({ secondsRemaining, totalSessionsDuration });
-
   const handleCompleteTask = async () => {
     try {
       if (!activeMission?.id) throw new Error("No active mission");
       const success = await completeTask({ id: activeMission.id });
       if (success) {
-        clearActiveMission();
+        const savingTaskData = storeData(`completedTasks:${activeMission.id}`, {
+          sessions,
+        });
+        const invalidatingTasks = queryClient.invalidateQueries({
+          queryKey: ["tasks"],
+        });
+        // clearActiveMission();
+        clearSessions();
+        await Promise.all([savingTaskData, invalidatingTasks]);
       }
     } catch (error) {
       console.log({ error });
@@ -53,7 +62,7 @@ export default function TaskTimer() {
 
   return (
     <VStack className="gap-4">
-      <Card className="bg-blue-100 gap-8">
+      <Card className="gap-8">
         <HStack>
           <Text className="text-2xl font-bold">{activeMission?.content}</Text>
         </HStack>
@@ -128,6 +137,9 @@ export default function TaskTimer() {
             }}
           />
         ) : null}
+        <Button variant="outline" action="negative" onPress={clearSessions}>
+          <ButtonText>Cancel Task</ButtonText>
+        </Button>
       </VStack>
     </VStack>
   );

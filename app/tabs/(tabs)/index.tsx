@@ -2,7 +2,7 @@
 import { MissionTask } from "@/app/features/tasks/components/MissionTask";
 import useTasksQuery from "@/app/features/tasks/hooks/useTasksQuery";
 import { Text } from "@/components/ui/text";
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import { View } from "@/components/ui/view";
 import { sortByDueDateAndPriority } from "@/app/features/tasks/utils/sortTasks";
 import { useActiveMission } from "@/app/features/tasks/hooks/useActiveMission";
@@ -10,8 +10,10 @@ import { useTaskMutation } from "@/app/features/tasks/hooks/useTaskMutation";
 import TaskTimer from "@/app/features/tasks/components/TaskTimer";
 
 export default function Home() {
+  const [deferOffset, setDeferOffset] = useState(0);
   const { data: tasks } = useTasksQuery();
-  const { activeMission, sessions, setActiveMission } = useActiveMission();
+  const { activeMission, sessions, setActiveMission, toggleIsTaskPaused } =
+    useActiveMission();
   const { mutateAsync: updateTask } = useTaskMutation();
 
   async function handleIncrementDuration(amount: number) {
@@ -43,11 +45,17 @@ export default function Home() {
   // const debouncedIncrementDuration = _.debounce(handleIncrementDuration, 500);
 
   function initializeActiveMission() {
-    if (!tasks || !tasks.length || activeMission) {
+    if (!tasks || !tasks.length || (activeMission && sessions.length)) {
       return;
     }
     const sortedTasks = sortByDueDateAndPriority(tasks);
-    setActiveMission(sortedTasks[0]);
+    setActiveMission(sortedTasks[0 + deferOffset]);
+  }
+
+  function handleDefer() {
+    if (!activeMission) return;
+    setDeferOffset((prev) => prev + 1);
+    initializeActiveMission();
   }
 
   useEffect(() => {
@@ -64,6 +72,8 @@ export default function Home() {
           description={activeMission?.description}
           due={activeMission.due}
           duration={activeMission?.duration}
+          onStart={toggleIsTaskPaused}
+          onDefer={handleDefer}
           onDecrementDuration={() => handleIncrementDuration(-5)}
           onIncrementDuration={() => handleIncrementDuration(5)}
         />
