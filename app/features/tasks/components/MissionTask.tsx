@@ -20,7 +20,6 @@ type MissionTaskProps = {
   } | null;
   anxietyLevel?: number;
   difficultyLevel?: number;
-  onStart: () => void;
   onIncrementDuration: () => Promise<void> | undefined;
   onDecrementDuration: () => Promise<void> | undefined;
 };
@@ -32,7 +31,6 @@ export function MissionTask({
   duration,
   onIncrementDuration,
   onDecrementDuration,
-  onStart,
   anxietyLevel,
   difficultyLevel,
 }: MissionTaskProps) {
@@ -63,12 +61,7 @@ export function MissionTask({
         </HStack>
       </HStack>
       <HStack className="flex gap-2">
-        <Button
-          size="lg"
-          className="flex-1"
-          action="positive"
-          onPress={onStart}
-        >
+        <Button size="lg" className="flex-1" action="positive">
           <ButtonText>Start Task</ButtonText>
         </Button>
         <Button size="lg" action="secondary">

@@ -11,13 +11,11 @@ import TaskTimer from "@/app/features/tasks/components/TaskTimer";
 
 export default function Home() {
   const { data: tasks } = useTasksQuery();
-  const { activeMission, setActiveMission, progress, startTask, pauseTask } =
-    useActiveMission();
+  const { activeMission, sessions, setActiveMission } = useActiveMission();
   const { mutateAsync: updateTask } = useTaskMutation();
-  console.log({ progress });
 
   async function handleIncrementDuration(amount: number) {
-    const oldActiveMission = activeMission;
+    // const oldActiveMission = activeMission;
     try {
       if (!activeMission) return;
       const updatedDuration = (activeMission?.duration?.amount || 25) + amount;
@@ -38,7 +36,7 @@ export default function Home() {
       // setActiveMission(updatedMission);
     } catch (error) {
       console.log({ error });
-      setActiveMission(oldActiveMission);
+      // setActiveMission(oldActiveMission);
     }
   }
 
@@ -58,7 +56,7 @@ export default function Home() {
 
   return (
     <View className="flex p-4">
-      {progress ? (
+      {sessions?.length ? (
         <TaskTimer />
       ) : activeMission ? (
         <MissionTask
@@ -68,7 +66,6 @@ export default function Home() {
           duration={activeMission?.duration}
           onDecrementDuration={() => handleIncrementDuration(-5)}
           onIncrementDuration={() => handleIncrementDuration(5)}
-          onStart={startTask}
         />
       ) : (
         <Text>No tasks</Text>

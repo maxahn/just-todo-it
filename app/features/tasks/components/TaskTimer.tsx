@@ -3,15 +3,25 @@ import { Text } from "@/components/ui/text";
 import { useActiveMission } from "../hooks/useActiveMission";
 import Stopwatch from "./Stopwatch";
 import { HStack } from "@/components/ui/hstack";
-import { Button, ButtonIcon, ButtonText } from "@/components/ui/button";
+import {
+  Button,
+  ButtonIcon,
+  ButtonSpinner,
+  ButtonText,
+} from "@/components/ui/button";
 import { VStack } from "@/components/ui/vstack";
 import { useState } from "react";
 import { Heading } from "@/components/ui/heading";
-import { X } from "lucide-react-native";
+import { ChevronDown, ChevronUp, X } from "lucide-react-native";
 import { formatSession, secondsToFormattedTime } from "../utils/formatTime";
 import { parseISO } from "date-fns";
+import Animated, { LinearTransition } from "react-native-reanimated";
+import { useCompleteTaskMutation } from "../hooks/useCompleteTaskMutation";
 
 export default function TaskTimer() {
+  const [sessionsVisible, setSessionsVisible] = useState(false);
+  const { mutateAsync: completeTask, isPending: isCompleting } =
+    useCompleteTaskMutation();
   const {
     activeMission,
     sessions,
@@ -19,6 +29,7 @@ export default function TaskTimer() {
     toggleIsTaskPaused,
     getTotalSessionsDuration,
     removeSession,
+    clearActiveMission,
   } = useActiveMission();
   const estimatedSeconds = activeMission?.duration?.amount
     ? activeMission.duration.amount * 60
@@ -26,7 +37,19 @@ export default function TaskTimer() {
   const [secondsRemaining, setSecondsRemaining] = useState(estimatedSeconds);
   const totalSessionsDuration = getTotalSessionsDuration();
 
-  console.log({ totalSessionsDuration, estimatedSeconds, sessions });
+  console.log({ secondsRemaining, totalSessionsDuration });
+
+  const handleCompleteTask = async () => {
+    try {
+      if (!activeMission?.id) throw new Error("No active mission");
+      const success = await completeTask({ id: activeMission.id });
+      if (success) {
+        clearActiveMission();
+      }
+    } catch (error) {
+      console.log({ error });
+    }
+  };
 
   return (
     <VStack className="gap-4">
@@ -42,47 +65,69 @@ export default function TaskTimer() {
           onToggleIsPaused={toggleIsTaskPaused}
         />
       </Card>
-      <Button size="xl" action="positive">
+
+      <Button size="xl" action="positive" onPress={handleCompleteTask}>
+        {isCompleting ? <ButtonSpinner color="white" /> : null}
         <ButtonText>Complete Task</ButtonText>
       </Button>
 
       <VStack className="gap-2">
-        <Heading size="xl">Sessions</Heading>
-        {sessions
-          ?.map(([start, end], index) => (
-            <Card key={`${start}`}>
-              <HStack className="flex justify-between items-center">
-                <VStack className="flex align-center">
-                  {end ? (
-                    <Text className="text-bold">
-                      {secondsToFormattedTime(
-                        Math.floor(
-                          (parseISO(end).getTime() -
-                            parseISO(start).getTime()) /
-                            1000,
-                        ),
-                      )}
-                    </Text>
-                  ) : null}
-                  <Text size="sm" className="inline-block align-middle">
-                    {formatSession([start, end])}
-                  </Text>
-                </VStack>
-                <Button
-                  size="sm"
-                  variant="link"
-                  className="rounded-full p-2"
-                  action="secondary"
-                  onPress={() => {
-                    removeSession(index);
-                  }}
-                >
-                  <ButtonIcon as={X} />
-                </Button>
-              </HStack>
-            </Card>
-          ))
-          .toReversed()}
+        <HStack className="flex justify-between items-center">
+          <Heading size="xl">Sessions</Heading>
+          <Button
+            size="xl"
+            variant="link"
+            className="rounded-full p-2"
+            onPress={() => setSessionsVisible((prev) => !prev)}
+          >
+            <ButtonIcon as={sessionsVisible ? ChevronDown : ChevronUp} />
+          </Button>
+        </HStack>
+        {sessionsVisible ? (
+          <Animated.FlatList
+            data={sessions}
+            itemLayoutAnimation={LinearTransition}
+            inverted
+            keyExtractor={(item) => item[0]}
+            contentContainerStyle={{ gap: 8 }}
+            renderItem={({ item, index }) => {
+              const [start, end] = item;
+              return (
+                <Card>
+                  <HStack className="flex justify-between items-center">
+                    <VStack className="flex align-center">
+                      {end ? (
+                        <Text className="text-bold">
+                          {secondsToFormattedTime(
+                            Math.floor(
+                              (parseISO(end).getTime() -
+                                parseISO(start).getTime()) /
+                                1000,
+                            ),
+                          )}
+                        </Text>
+                      ) : null}
+                      <Text size="xs" className="inline-block align-middle">
+                        {formatSession([start, end])}
+                      </Text>
+                    </VStack>
+                    <Button
+                      size="sm"
+                      variant="link"
+                      className="rounded-full p-2"
+                      action="secondary"
+                      onPress={() => {
+                        removeSession(index);
+                      }}
+                    >
+                      <ButtonIcon as={X} />
+                    </Button>
+                  </HStack>
+                </Card>
+              );
+            }}
+          />
+        ) : null}
       </VStack>
     </VStack>
   );
