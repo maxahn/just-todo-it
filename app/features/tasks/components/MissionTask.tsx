@@ -1,8 +1,11 @@
+import { parseFromDateString } from "@/app/util/date/parseFromDate";
 import { Button, ButtonIcon, ButtonText } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { HStack } from "@/components/ui/hstack";
 import { AddIcon, RemoveIcon, ChevronsRightIcon } from "@/components/ui/icon";
 import { Text } from "@/components/ui/text";
+import { isToday } from "date-fns";
+import { isAfter } from "date-fns/isAfter";
 
 type MissionTaskProps = {
   title: string;
@@ -38,6 +41,11 @@ export function MissionTask({
   anxietyLevel,
   difficultyLevel,
 }: MissionTaskProps) {
+  const dueDate = due?.date ? parseFromDateString(due.date) : null;
+  const overdue = dueDate
+    ? isAfter(dueDate, new Date().setHours(0, 0, 0, 0)) || !isToday(dueDate)
+    : false;
+
   return (
     <Card className="rounded-xl p-6 gap-4">
       <HStack className="justify-between items-center">
@@ -50,9 +58,13 @@ export function MissionTask({
         <Text className="text-xl font-bold">{title}</Text>
         {description ? <Text className="text-lg">{description}</Text> : null}
         {due ? (
-          <Text className="text-lg text-right font-bold mt-2">
-            {due.string || due.datetime || due.date}
-          </Text>
+          <HStack className="gap-2">
+            <Text
+              className={`text-lg text-right font-bold mt-2 ${overdue ? "text-red-600" : "text-green-500"}`}
+            >
+              {due.string} {due.date} {due.datetime}
+            </Text>
+          </HStack>
         ) : null}
       </Card>
       <HStack className="justify-between items-center">
