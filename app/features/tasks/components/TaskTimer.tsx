@@ -37,7 +37,6 @@ export default function TaskTimer() {
   const estimatedSeconds = activeMission?.duration?.amount
     ? activeMission.duration.amount * 60
     : 25 * 60;
-  const [secondsRemaining, setSecondsRemaining] = useState(estimatedSeconds);
   const totalSessionsDuration = getTotalSessionsDuration();
 
   const handleCompleteTask = async () => {
@@ -67,8 +66,7 @@ export default function TaskTimer() {
           <Text className="text-2xl font-bold">{activeMission?.content}</Text>
         </HStack>
         <Stopwatch
-          secondsRemaining={secondsRemaining - totalSessionsDuration}
-          setSecondsRemaining={setSecondsRemaining}
+          offset={-totalSessionsDuration}
           estimatedSeconds={estimatedSeconds}
           isPaused={!getIsActive()}
           onToggleIsPaused={toggleIsTaskPaused}

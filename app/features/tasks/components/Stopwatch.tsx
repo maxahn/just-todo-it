@@ -3,24 +3,25 @@ import { Text } from "@/components/ui/text";
 import { HStack } from "@/components/ui/hstack";
 import { Button, ButtonIcon } from "@/components/ui/button";
 import { PauseIcon, PlayIcon } from "lucide-react-native";
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import { secondsToFormattedTime } from "../utils/formatTime";
 
 type StopwatchProps = {
-  estimatedSeconds: number;
+  offset?: number;
   isPaused: boolean;
   onToggleIsPaused: () => void;
-  secondsRemaining: number;
-  setSecondsRemaining: React.Dispatch<React.SetStateAction<number>>;
+  estimatedSeconds: number;
 };
 
 export default function Stopwatch({
   isPaused,
   onToggleIsPaused,
-  secondsRemaining,
-  setSecondsRemaining,
   estimatedSeconds,
+  offset = 0,
 }: StopwatchProps) {
+  const [secondsRemaining, setSecondsRemaining] = useState(
+    estimatedSeconds + offset,
+  );
   useEffect(() => {
     const countdownTimer = setInterval(() => {
       if (isPaused) return;
