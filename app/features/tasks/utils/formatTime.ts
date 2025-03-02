@@ -6,7 +6,7 @@ export function secondsToFormattedTime(seconds: number) {
   const hours = Math.floor(seconds / 3600);
   const minutes = String(Math.floor((seconds % 3600) / 60)).padStart(2, "0");
   const remainingSeconds = String(seconds % 60).padStart(2, "0");
-  return `${hours ? String(hours).padStart(2, "0") : ""}${minutes}:${remainingSeconds}`;
+  return `${hours ? String(hours).padStart(2, "0") : ""}:${minutes}:${remainingSeconds}`;
 }
 export const formatSession = (session: [string, string | null]) => {
   const [start, end] = session;
