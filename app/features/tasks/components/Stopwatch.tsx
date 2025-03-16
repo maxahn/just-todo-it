@@ -12,6 +12,7 @@ type StopwatchProps = {
   isPaused: boolean;
   onToggleIsPaused: () => void;
   estimatedSeconds: number;
+  hideControls?: boolean;
 };
 
 export default function Stopwatch({
@@ -19,6 +20,7 @@ export default function Stopwatch({
   onToggleIsPaused,
   estimatedSeconds,
   offset = 0,
+  hideControls = false,
 }: StopwatchProps) {
   const [secondsRemaining, setSecondsRemaining] = useState(
     estimatedSeconds + offset,
@@ -54,13 +56,15 @@ export default function Stopwatch({
         </Text>
       </VStack>
       <HStack className="flex justify-center">
-        <Button
-          size="xl"
-          className="rounded-full p-3.5"
-          onPress={onToggleIsPaused}
-        >
-          <ButtonIcon as={isPaused ? PlayIcon : PauseIcon} />
-        </Button>
+        {!hideControls ? (
+          <Button
+            size="xl"
+            className="rounded-full p-3.5"
+            onPress={onToggleIsPaused}
+          >
+            <ButtonIcon as={isPaused ? PlayIcon : PauseIcon} />
+          </Button>
+        ) : null}
       </HStack>
     </VStack>
   );

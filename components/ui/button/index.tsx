@@ -109,7 +109,7 @@ const buttonStyle = tva({
       action: "positive",
       variant: "outline",
       class:
-        "bg-transparent data-[hover=true]:bg-background-50 data-[active=true]:bg-transparent",
+        "bg-transparent data-[hover=true]:bg-background-50 data-[active=true]:bg-success-500",
     },
     {
       action: "negative",
@@ -202,7 +202,7 @@ const buttonTextStyle = tva({
       variant: "outline",
       action: "negative",
       class:
-        "text-primary-500 data-[hover=true]:text-primary-500 data-[active=true]:text-primary-500",
+        "text-error-500 data-[hover=true]:text-primary-500 data-[active=true]:text-primary-500",
     },
   ],
 });
@@ -260,13 +260,13 @@ const buttonIconStyle = tva({
       variant: "solid",
       action: "positive",
       class:
-        "text-typography-0 data-[hover=true]:text-typography-0 data-[active=true]:text-typography-0",
+        "text-typography-700 data-[hover=true]:text-typography-0 data-[active=true]:text-typography-0",
     },
     {
       variant: "solid",
       action: "negative",
       class:
-        "text-typography-0 data-[hover=true]:text-typography-0 data-[active=true]:text-typography-0",
+        "text-typography-700 data-[hover=true]:text-typography-0 data-[active=true]:text-typography-0",
     },
   ],
 });

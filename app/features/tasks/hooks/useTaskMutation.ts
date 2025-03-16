@@ -1,4 +1,8 @@
-import { MutationOptions, useMutation } from "@tanstack/react-query";
+import {
+  MutationOptions,
+  useMutation,
+  useQueryClient,
+} from "@tanstack/react-query";
 import { Task, TaskUpdate } from "../types";
 
 type TaskMutationArgs = {
@@ -8,6 +12,7 @@ type TaskMutationArgs = {
 export const useTaskMutation = (
   options?: MutationOptions<Task, Error, TaskMutationArgs>,
 ) => {
+  const queryClient = useQueryClient();
   return useMutation({
     mutationKey: ["task"],
     mutationFn: async ({ id, taskChange }: TaskMutationArgs): Promise<Task> => {
@@ -26,6 +31,9 @@ export const useTaskMutation = (
         throw new Error("Network response was not ok");
       }
       return response.json() as Promise<Task>;
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["tasks"] });
     },
     ...options,
   });

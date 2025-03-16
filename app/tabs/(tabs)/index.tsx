@@ -78,8 +78,9 @@ export default function Home() {
       {sessions?.length ? (
         <TaskTimer />
       ) : activeMission ? (
-        <VStack className="flex h-full justify-between px-4">
+        <>
           <MissionTask
+            id={activeMission.id}
             title={activeMission.content}
             description={activeMission?.description}
             due={activeMission.due}
@@ -89,14 +90,14 @@ export default function Home() {
             onDecrementDuration={() => handleIncrementDuration(-5)}
             onIncrementDuration={() => handleIncrementDuration(5)}
           />
-          <HStack className="align-center gap-2 justify-end items-center">
-            <Text className="font-semibold">Today Only</Text>
-            <Switch value={todayOnly} onToggle={setTodayOnly} />
-          </HStack>
-        </VStack>
+        </>
       ) : (
         <Text>No tasks</Text>
       )}
+      <HStack className="align-center gap-2 justify-end items-center">
+        <Text className="font-semibold">Today Only</Text>
+        <Switch value={todayOnly} onToggle={setTodayOnly} />
+      </HStack>
     </ScreenWrapper>
   );
 }

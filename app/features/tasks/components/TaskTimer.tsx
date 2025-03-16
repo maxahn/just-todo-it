@@ -12,19 +12,23 @@ import {
 import { VStack } from "@/components/ui/vstack";
 import { useState } from "react";
 import { Heading } from "@/components/ui/heading";
-import { ChevronDown, ChevronUp, X } from "lucide-react-native";
+import {
+  CheckIcon,
+  ChevronDown,
+  ChevronUp,
+  PauseIcon,
+  PlayIcon,
+  X,
+} from "lucide-react-native";
 import { formatSession, secondsToFormattedTime } from "../utils/formatTime";
 import { parseISO } from "date-fns";
 import Animated, { LinearTransition } from "react-native-reanimated";
 import { useCompleteTaskMutation } from "../hooks/useCompleteTaskMutation";
-import { storeData } from "@/app/util/localStorage/setData";
-import { useQueryClient } from "@tanstack/react-query";
 
 export default function TaskTimer() {
   const [sessionsVisible, setSessionsVisible] = useState(false);
   const { mutateAsync: completeTask, isPending: isCompleting } =
     useCompleteTaskMutation();
-  const queryClient = useQueryClient();
   const {
     activeMission,
     sessions,
@@ -42,49 +46,65 @@ export default function TaskTimer() {
   const handleCompleteTask = async () => {
     try {
       if (!activeMission?.id) throw new Error("No active mission");
-      const success = await completeTask({ id: activeMission.id });
-      if (success) {
-        const savingTaskData = storeData(`completedTasks:${activeMission.id}`, {
-          sessions,
-        });
-        const invalidatingTasks = queryClient.invalidateQueries({
-          queryKey: ["tasks"],
-        });
-        // clearActiveMission();
-        clearSessions();
-        await Promise.all([savingTaskData, invalidatingTasks]);
-      }
+      await completeTask({ id: activeMission.id });
     } catch (error) {
       console.log({ error });
     }
   };
 
+  const isPaused = !getIsActive();
   return (
-    <VStack className="gap-4">
-      <Card className="gap-8">
-        <HStack>
-          <Text className="text-2xl font-bold">{activeMission?.content}</Text>
-        </HStack>
-        <Stopwatch
-          offset={-totalSessionsDuration}
-          estimatedSeconds={estimatedSeconds}
-          isPaused={!getIsActive()}
-          onToggleIsPaused={toggleIsTaskPaused}
-        />
-      </Card>
+    <VStack className="flex items-center gap-6 py-5">
+      <VStack className="flex gap-3 items-center">
+        <Heading size="xl">Current Task</Heading>
+        <Heading size="lg" className="text-primary-300">
+          {activeMission?.content}
+        </Heading>
+      </VStack>
+      <Stopwatch
+        offset={-totalSessionsDuration}
+        estimatedSeconds={estimatedSeconds}
+        isPaused={isPaused}
+        onToggleIsPaused={toggleIsTaskPaused}
+        hideControls
+      />
 
-      <Button size="xl" action="positive" onPress={handleCompleteTask}>
-        {isCompleting ? <ButtonSpinner color="white" /> : null}
-        <ButtonText>Complete Task</ButtonText>
-      </Button>
+      <HStack className="justify-center gap-4 ">
+        <Button
+          size="lg"
+          action="negative"
+          className="rounded-full w-16 h-16"
+          onPress={toggleIsTaskPaused}
+        >
+          <ButtonIcon
+            className="w-7 h-7"
+            as={isPaused ? PlayIcon : PauseIcon}
+          />
+        </Button>
 
-      <VStack className="gap-2">
+        <Button
+          size="lg"
+          action="positive"
+          className="rounded-full w-16 h-16"
+          onPress={handleCompleteTask}
+          isDisabled={isCompleting}
+        >
+          {isCompleting ? (
+            <ButtonSpinner color="white" />
+          ) : (
+            <ButtonIcon className="w-7 h-7" as={CheckIcon} />
+          )}
+        </Button>
+      </HStack>
+
+      <VStack className="gap-2 w-full">
         <HStack className="flex justify-between items-center">
-          <Heading size="xl">Sessions</Heading>
+          <Heading size="md">Sessions</Heading>
           <Button
             size="xl"
             variant="link"
             className="rounded-full p-2"
+            action="secondary"
             onPress={() => setSessionsVisible((prev) => !prev)}
           >
             <ButtonIcon as={sessionsVisible ? ChevronDown : ChevronUp} />
@@ -136,7 +156,7 @@ export default function TaskTimer() {
           />
         ) : null}
         <Button variant="outline" action="negative" onPress={clearSessions}>
-          <ButtonText>Cancel Task</ButtonText>
+          <ButtonText>Cancel Session</ButtonText>
         </Button>
       </VStack>
     </VStack>

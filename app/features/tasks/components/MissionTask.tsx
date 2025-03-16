@@ -9,8 +9,11 @@ import { AddIcon, RemoveIcon, ChevronsRightIcon } from "@/components/ui/icon";
 import { Text } from "@/components/ui/text";
 import { isToday } from "date-fns";
 import { isAfter } from "date-fns/isAfter";
+import { CheckIcon } from "lucide-react-native";
+import { useCompleteTaskMutation } from "../hooks/useCompleteTaskMutation";
 
 type MissionTaskProps = {
+  id: string;
   title: string;
   description: string;
   due?: {
@@ -33,6 +36,7 @@ type MissionTaskProps = {
 };
 
 export function MissionTask({
+  id,
   title,
   description,
   due,
@@ -49,13 +53,30 @@ export function MissionTask({
     ? isAfter(dueDate, new Date().setHours(0, 0, 0, 0)) || !isToday(dueDate)
     : false;
 
+  const { mutateAsync: completeTask, isPending } = useCompleteTaskMutation();
+
+  const handleCompleteTask = async () => {
+    try {
+      await completeTask({ id });
+    } catch (error) {
+      console.log({ error });
+    }
+  };
+
   return (
     <Card className="rounded-xl p-6 gap-4" variant="filled">
       <HStack className="justify-between items-center">
         <Text className="text-2xl font-bold">Current Task</Text>
-        {/* <Button size="lg" action="positive" variant="outline">
-          <ButtonText className="0">Complete</ButtonText>
-        </Button> */}
+        <Button
+          action="positive"
+          variant="outline"
+          size="sm"
+          className="rounded-full h-8 w-8"
+          disabled={isPending}
+          onPress={handleCompleteTask}
+        >
+          <ButtonIcon as={CheckIcon} />
+        </Button>
       </HStack>
       <Card className="rounded-xl p-6 mt-3 ">
         <Text className="text-xl font-bold">{title}</Text>
