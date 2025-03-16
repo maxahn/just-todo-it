@@ -10,7 +10,7 @@ import {
   ButtonText,
 } from "@/components/ui/button";
 import { VStack } from "@/components/ui/vstack";
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import { Heading } from "@/components/ui/heading";
 import { ChevronDown, ChevronUp, X } from "lucide-react-native";
 import { formatSession, secondsToFormattedTime } from "../utils/formatTime";
@@ -19,11 +19,9 @@ import Animated, { LinearTransition } from "react-native-reanimated";
 import { useCompleteTaskMutation } from "../hooks/useCompleteTaskMutation";
 import { storeData } from "@/app/util/localStorage/setData";
 import { useQueryClient } from "@tanstack/react-query";
-import useAppState from "@/hooks/useAppStateChange";
 
 export default function TaskTimer() {
   const [sessionsVisible, setSessionsVisible] = useState(false);
-  const appState = useAppState();
   const { mutateAsync: completeTask, isPending: isCompleting } =
     useCompleteTaskMutation();
   const queryClient = useQueryClient();

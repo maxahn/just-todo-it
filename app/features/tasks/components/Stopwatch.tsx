@@ -3,9 +3,8 @@ import { Text } from "@/components/ui/text";
 import { HStack } from "@/components/ui/hstack";
 import { Button, ButtonIcon } from "@/components/ui/button";
 import { PauseIcon, PlayIcon } from "lucide-react-native";
-import { useCallback, useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 import { secondsToFormattedTime } from "../utils/formatTime";
-import { useFocusEffect } from "expo-router";
 import useAppState from "@/hooks/useAppStateChange";
 
 type StopwatchProps = {
