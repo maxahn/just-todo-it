@@ -62,7 +62,7 @@ function RootLayoutNav() {
 
   return (
     <QueryClientProvider client={queryClient}>
-      <GluestackUIProvider mode={colorScheme === "dark" ? "dark" : "light"}>
+      <GluestackUIProvider mode={"dark"}>
         <ThemeProvider
           value={colorScheme === "dark" ? DarkTheme : DefaultTheme}
         >

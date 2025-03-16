@@ -1,4 +1,7 @@
-import { parseFromDateString } from "@/app/util/date/parseFromDate";
+import {
+  getHumanReadableDate,
+  parseFromDateString,
+} from "@/app/util/date/parseFromDate";
 import { Button, ButtonIcon, ButtonText } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { HStack } from "@/components/ui/hstack";
@@ -47,50 +50,58 @@ export function MissionTask({
     : false;
 
   return (
-    <Card className="rounded-xl p-6 gap-4">
+    <Card className="rounded-xl p-6 gap-4" variant="filled">
       <HStack className="justify-between items-center">
         <Text className="text-2xl font-bold">Current Task</Text>
         {/* <Button size="lg" action="positive" variant="outline">
           <ButtonText className="0">Complete</ButtonText>
         </Button> */}
       </HStack>
-      <Card className="rounded-xl p-6 mt-3">
+      <Card className="rounded-xl p-6 mt-3 ">
         <Text className="text-xl font-bold">{title}</Text>
-        {description ? <Text className="text-lg">{description}</Text> : null}
         {due ? (
           <HStack className="gap-2">
             <Text
-              className={`text-lg text-right font-bold mt-2 ${overdue ? "text-red-600" : "text-green-500"}`}
+              size="sm"
+              className={`text-right font-bold mt-2 ${overdue ? "text-red-600" : "text-green-500"}`}
             >
-              {due.string} {due.date} {due.datetime}
+              {getHumanReadableDate(due.date)}
             </Text>
           </HStack>
+        ) : null}
+        {description ? (
+          <Text size="md" className="text-typography-500 mt-2">
+            {description}
+          </Text>
         ) : null}
       </Card>
       <HStack className="justify-between items-center">
         <Text>Time Estimation</Text>
         <HStack className="gap-2 items-center">
-          <Button className="rounded-full w-1" onPress={onDecrementDuration}>
+          <Button
+            className="rounded-full w-1"
+            onPress={onDecrementDuration}
+            action="tertiary"
+          >
             <ButtonIcon as={RemoveIcon} />
           </Button>
-          <Text>
+          <Text className="font-bold">
             {duration ? `${duration.amount} ${duration.unit}` : "25m"}
           </Text>
-          <Button className="rounded-full w-1" onPress={onIncrementDuration}>
+          <Button
+            className="rounded-full w-1"
+            onPress={onIncrementDuration}
+            action="tertiary"
+          >
             <ButtonIcon as={AddIcon} />
           </Button>
         </HStack>
       </HStack>
       <HStack className="flex gap-2">
-        <Button
-          size="lg"
-          className="flex-1"
-          action="positive"
-          onPress={onStart}
-        >
+        <Button size="xl" className="flex-1" onPress={onStart}>
           <ButtonText>Start Task</ButtonText>
         </Button>
-        <Button size="lg" action="secondary" onPress={onDefer}>
+        <Button size="xl" action="secondary" onPress={onDefer}>
           <ButtonIcon as={ChevronsRightIcon} />
         </Button>
       </HStack>

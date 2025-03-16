@@ -119,7 +119,6 @@ export const DUE_TODAY = {
   duration: null,
   deadline: null,
 };
-console.log({ DUE_TODAY });
 export const DUE_TOMORROW = {
   id: "8833834821",
   assigner_id: null,

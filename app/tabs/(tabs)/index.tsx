@@ -3,16 +3,16 @@ import { MissionTask } from "@/app/features/tasks/components/MissionTask";
 import useTasksQuery from "@/app/features/tasks/hooks/useTasksQuery";
 import { Text } from "@/components/ui/text";
 import { useEffect, useState } from "react";
-import { View } from "@/components/ui/view";
 import { sortByDueDateAndPriority } from "@/app/features/tasks/utils/sortTasks";
 import { useActiveMission } from "@/app/features/tasks/hooks/useActiveMission";
 import { useTaskMutation } from "@/app/features/tasks/hooks/useTaskMutation";
 import TaskTimer from "@/app/features/tasks/components/TaskTimer";
-import { format, isToday } from "date-fns";
+import { format } from "date-fns";
 import { DUE_DATE_FORMAT } from "@/app/util/date/FORMAT";
 import { VStack } from "@/components/ui/vstack";
 import { Switch } from "@/components/ui/switch";
 import { HStack } from "@/components/ui/hstack";
+import { ScreenWrapper } from "@/components/ui/wrapper/ScreenWrapper";
 
 export default function Home() {
   const [deferOffset, setDeferOffset] = useState(0);
@@ -74,11 +74,11 @@ export default function Home() {
   }, [tasks, todayOnly]);
 
   return (
-    <View className="flex p-4">
+    <ScreenWrapper>
       {sessions?.length ? (
         <TaskTimer />
       ) : activeMission ? (
-        <VStack className="flex h-full justify-between">
+        <VStack className="flex h-full justify-between px-4">
           <MissionTask
             title={activeMission.content}
             description={activeMission?.description}
@@ -97,6 +97,6 @@ export default function Home() {
       ) : (
         <Text>No tasks</Text>
       )}
-    </View>
+    </ScreenWrapper>
   );
 }

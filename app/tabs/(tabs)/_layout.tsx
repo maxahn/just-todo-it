@@ -31,6 +31,7 @@ export default function TabLayout() {
         name="index"
         options={{
           title: "Current Task",
+          headerShown: false,
           tabBarIcon: ({ color }) => (
             <TabBarIcon name="bullseye" color={color} />
           ),

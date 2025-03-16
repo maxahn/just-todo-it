@@ -3,8 +3,10 @@ import { Text } from "@/components/ui/text";
 import { HStack } from "@/components/ui/hstack";
 import { Button, ButtonIcon } from "@/components/ui/button";
 import { PauseIcon, PlayIcon } from "lucide-react-native";
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import { secondsToFormattedTime } from "../utils/formatTime";
+import { useFocusEffect } from "expo-router";
+import useAppState from "@/hooks/useAppStateChange";
 
 type StopwatchProps = {
   offset?: number;
@@ -22,6 +24,9 @@ export default function Stopwatch({
   const [secondsRemaining, setSecondsRemaining] = useState(
     estimatedSeconds + offset,
   );
+
+  const appState = useAppState();
+
   useEffect(() => {
     const countdownTimer = setInterval(() => {
       if (isPaused) return;
@@ -29,6 +34,14 @@ export default function Stopwatch({
     }, 1000);
     return () => clearInterval(countdownTimer);
   }, [isPaused]);
+
+  // On Android, timer pauses when app goes to background
+  // So this re-syncs when app is active again
+  useEffect(() => {
+    if (appState === "active") {
+      setSecondsRemaining(estimatedSeconds + offset);
+    }
+  }, [appState]);
 
   return (
     <VStack className="flex justify-center gap-3">
