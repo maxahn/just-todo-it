@@ -35,9 +35,7 @@ function getEstimateSeconds(
 
 export default function TaskTimer() {
   const [sessionsVisible, setSessionsVisible] = useState(false);
-  const [estimatedSeconds, setEstimatedSeconds] = useState(
-    DEFAULT_ESTIMATE_SECONDS,
-  );
+  const [offset, setOffset] = useState(0);
   const { mutateAsync: completeTask, isPending: isCompleting } =
     useCompleteTaskMutation();
   const {
@@ -50,7 +48,7 @@ export default function TaskTimer() {
     clearSessions,
   } = useActiveMission();
   const appState = useAppState();
-  const totalSessionsDuration = getTotalSessionsDuration();
+  const estimatedSeconds = getEstimateSeconds(activeMission?.duration);
 
   const handleCompleteTask = async () => {
     try {
@@ -63,10 +61,8 @@ export default function TaskTimer() {
 
   useEffect(() => {
     if (appState === "active" && activeMission) {
-      const updatedEstimatedSeconds = getEstimateSeconds(
-        activeMission.duration,
-      );
-      setEstimatedSeconds(updatedEstimatedSeconds - totalSessionsDuration);
+      const totalSessionsDuration = getTotalSessionsDuration();
+      setOffset(-totalSessionsDuration);
     }
   }, [appState]);
 
@@ -80,7 +76,7 @@ export default function TaskTimer() {
         </Heading>
       </VStack>
       <Stopwatch
-        offset={-totalSessionsDuration}
+        offset={offset}
         estimatedSeconds={estimatedSeconds}
         isPaused={isPaused}
         onToggleIsPaused={toggleIsTaskPaused}
