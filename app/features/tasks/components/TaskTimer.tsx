@@ -10,7 +10,7 @@ import {
   ButtonText,
 } from "@/components/ui/button";
 import { VStack } from "@/components/ui/vstack";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { Heading } from "@/components/ui/heading";
 import {
   CheckIcon,
@@ -24,9 +24,20 @@ import { formatSession, secondsToFormattedTime } from "../utils/formatTime";
 import { parseISO } from "date-fns";
 import Animated, { LinearTransition } from "react-native-reanimated";
 import { useCompleteTaskMutation } from "../hooks/useCompleteTaskMutation";
+import useAppState from "@/hooks/useAppStateChange";
+
+const DEFAULT_ESTIMATE_SECONDS = 25 * 60;
+function getEstimateSeconds(
+  duration: { amount: number; unit: string } | undefined | null,
+) {
+  return duration?.amount ? duration.amount * 60 : DEFAULT_ESTIMATE_SECONDS;
+}
 
 export default function TaskTimer() {
   const [sessionsVisible, setSessionsVisible] = useState(false);
+  const [estimatedSeconds, setEstimatedSeconds] = useState(
+    DEFAULT_ESTIMATE_SECONDS,
+  );
   const { mutateAsync: completeTask, isPending: isCompleting } =
     useCompleteTaskMutation();
   const {
@@ -38,9 +49,7 @@ export default function TaskTimer() {
     removeSession,
     clearSessions,
   } = useActiveMission();
-  const estimatedSeconds = activeMission?.duration?.amount
-    ? activeMission.duration.amount * 60
-    : 25 * 60;
+  const appState = useAppState();
   const totalSessionsDuration = getTotalSessionsDuration();
 
   const handleCompleteTask = async () => {
@@ -51,6 +60,15 @@ export default function TaskTimer() {
       console.log({ error });
     }
   };
+
+  useEffect(() => {
+    if (appState === "active" && activeMission) {
+      const updatedEstimatedSeconds = getEstimateSeconds(
+        activeMission.duration,
+      );
+      setEstimatedSeconds(updatedEstimatedSeconds - totalSessionsDuration);
+    }
+  }, [appState]);
 
   const isPaused = !getIsActive();
   return (
