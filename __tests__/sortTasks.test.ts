@@ -1,4 +1,4 @@
-import { sortByDueDateAndPriority } from "./sortTasks";
+import { sortByDueDateAndPriority } from "../app/features/tasks/utils/sortTasks";
 import {
   DUE_TODAY,
   DUE_TOMORROW,
@@ -60,7 +60,6 @@ test("order tasks with same due date but higher priority", () => {
   const P4 = { ...DUE_TOMORROW, priority: 1 };
   const tasks = [P2, P4, P1, P3];
   const sortedTasks = sortByDueDateAndPriority(tasks);
-  console.log({ tasks, sortedTasks });
   expect(sortedTasks[0].content).toBe(P1.content);
   expect(sortedTasks[1].content).toBe(P2.content);
   expect(sortedTasks[2].content).toBe(P3.content);

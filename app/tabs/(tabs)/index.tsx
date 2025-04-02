@@ -1,54 +1,103 @@
+// import _ from "lodash";
 import { MissionTask } from "@/app/features/tasks/components/MissionTask";
 import useTasksQuery from "@/app/features/tasks/hooks/useTasksQuery";
-import { Center } from "@/components/ui/center";
-import { Divider } from "@/components/ui/divider";
-import { Heading } from "@/components/ui/heading";
 import { Text } from "@/components/ui/text";
 import { useEffect, useState } from "react";
-import { Task } from "@/app/features/tasks/types";
-import { View } from "@/components/ui/view";
+import { sortByDueDateAndPriority } from "@/app/features/tasks/utils/sortTasks";
+import { useActiveMission } from "@/app/features/tasks/hooks/useActiveMission";
+import { useTaskMutation } from "@/app/features/tasks/hooks/useTaskMutation";
+import TaskTimer from "@/app/features/tasks/components/TaskTimer";
+import { format } from "date-fns";
+import { DUE_DATE_FORMAT } from "@/app/util/date/FORMAT";
+import { VStack } from "@/components/ui/vstack";
+import { Switch } from "@/components/ui/switch";
+import { HStack } from "@/components/ui/hstack";
+import { ScreenWrapper } from "@/components/ui/wrapper/ScreenWrapper";
 
 export default function Home() {
-  const { data: tasks, isLoading } = useTasksQuery();
-  const [activeTask, setActiveTask] = useState<Task | null>(null);
+  const [deferOffset, setDeferOffset] = useState(0);
+  const [todayOnly, setTodayOnly] = useState(true);
+  const { data: tasks } = useTasksQuery();
+  const { activeMission, sessions, setActiveMission, toggleIsTaskPaused } =
+    useActiveMission();
+  const { mutateAsync: updateTask } = useTaskMutation();
 
-  useEffect(() => {
-    if (!tasks || !tasks.length) {
+  async function handleIncrementDuration(amount: number) {
+    // const oldActiveMission = activeMission;
+    try {
+      if (!activeMission) return;
+      const updatedDuration = (activeMission?.duration?.amount || 25) + amount;
+      setActiveMission({
+        ...activeMission,
+        duration: {
+          amount: updatedDuration,
+          unit: activeMission?.duration?.unit || "minute",
+        },
+      });
+      await updateTask({
+        id: activeMission.id,
+        taskChange: {
+          duration: updatedDuration,
+          duration_unit: "minute",
+        },
+      });
+      // setActiveMission(updatedMission);
+    } catch (error) {
+      console.log({ error });
+      // setActiveMission(oldActiveMission);
+    }
+  }
+  // const debouncedIncrementDuration = _.debounce(handleIncrementDuration, 500);
+
+  function initializeActiveMission() {
+    if (!tasks || !tasks.length || (activeMission && sessions.length)) {
       return;
     }
-    const sortedTasks = tasks.sort((a, b) => {
-      const aDue = a.due;
-      const bDue = b.due;
-      if (!aDue && !bDue) {
-        return a.priority > b.order ? -1 : 1;
-      }
-      const aDueDatetime = aDue?.date;
-      const bDueDatetime = bDue?.date;
-      if (aDueDatetime && bDueDatetime) {
-        return aDueDatetime > bDueDatetime ? -1 : 1;
-      }
-      if (aDueDatetime) {
-        return -1;
-      }
-      return 1;
-    });
+    const sortedTasks = sortByDueDateAndPriority(tasks);
+    const today = format(new Date(), DUE_DATE_FORMAT);
+    const filteredTasks = todayOnly
+      ? sortedTasks.filter((task) => {
+          return task.due?.date === today;
+        })
+      : sortedTasks;
+    setActiveMission(filteredTasks[0 + deferOffset]);
+  }
 
-    console.log({ tasks, sortedTasks });
-    setActiveTask(sortedTasks[0]);
-  }, [tasks]);
+  function handleDefer() {
+    if (!activeMission) return;
+    setDeferOffset((prev) => prev + 1);
+    initializeActiveMission();
+  }
+
+  useEffect(() => {
+    initializeActiveMission();
+  }, [tasks, todayOnly]);
 
   return (
-    <View className="flex p-4">
-      {activeTask ? (
-        <MissionTask
-          title={activeTask.content}
-          description={activeTask?.description}
-          due={activeTask.due}
-          duration={activeTask?.duration}
-        />
+    <ScreenWrapper>
+      {sessions?.length ? (
+        <TaskTimer />
+      ) : activeMission ? (
+        <>
+          <MissionTask
+            id={activeMission.id}
+            title={activeMission.content}
+            description={activeMission?.description}
+            due={activeMission.due}
+            duration={activeMission?.duration}
+            onStart={toggleIsTaskPaused}
+            onDefer={handleDefer}
+            onDecrementDuration={() => handleIncrementDuration(-5)}
+            onIncrementDuration={() => handleIncrementDuration(5)}
+          />
+        </>
       ) : (
         <Text>No tasks</Text>
       )}
-    </View>
+      <HStack className="align-center gap-2 justify-end items-center">
+        <Text className="font-semibold">Today Only</Text>
+        <Switch value={todayOnly} onToggle={setTodayOnly} />
+      </HStack>
+    </ScreenWrapper>
   );
 }

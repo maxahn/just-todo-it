@@ -1,3 +1,4 @@
+export type Priority = 1 | 2 | 3 | 4;
 export type Task = {
   id: string;
   creator_id: string;
@@ -20,13 +21,29 @@ export type Task = {
   } | null;
   duration: {
     amount: number;
-    unit: string; // "minute"
+    unit: "minute" | "day"; // "minute"
   } | null;
   labels: string[]; // ["Food", "Shopping"],
   order: number;
-  priority: number; // 1 | 2 | 3?
+  priority: Priority;
   project_id: string;
   section_id: string | null;
   parent_id: string | null;
   url: string; // "https://todoist.com/showTask?id=2995104339"
+};
+
+export type TaskUpdate = {
+  content?: string;
+  description?: string;
+  labels?: string[];
+  priority?: Priority;
+  due_date?: string;
+  due_datetime?: string;
+  due_string?: string;
+  due_lang?: string;
+  assignee_id?: string;
+  duration?: number;
+  duration_unit?: "minute" | "day";
+  deadline_date?: string;
+  deadline_lang?: string; // 2-letter code specifying language
 };

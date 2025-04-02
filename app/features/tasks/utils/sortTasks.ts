@@ -9,6 +9,8 @@ export function sortByDueDateAndPriority(tasks: Task[]): Task[] {
     if (!aDue && !bDue) {
       return a.priority >= b.priority ? -1 : 1;
     }
+    // TODO: handle datetime
+    // TODO: how does this handle subtasks?
     // If one has a due date and the other doesn't, sort by due date
     // TODO: need to have a threshold for this because it may be better to prioritize another task
     // if the due date is too far in the future

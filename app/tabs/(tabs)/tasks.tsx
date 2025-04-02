@@ -4,30 +4,37 @@ import { Center } from "@/components/ui/center";
 import { Text } from "@/components/ui/text";
 import useTasksQuery from "@/app/features/tasks/hooks/useTasksQuery";
 import { Spinner } from "@/components/ui/spinner";
+import { sortByDueDateAndPriority } from "@/app/features/tasks/utils/sortTasks";
+import { Card } from "@/components/ui/card";
 
 export default function Home() {
   const { data: tasks, isLoading } = useTasksQuery();
 
-  const sortedTasks = tasks?.sort((a, b) => {
-    const aDueDatetime = a.due?.datetime;
-    const bDueDatetime = b.due?.datetime;
-    if (!aDueDatetime && !bDueDatetime) {
-      return a.priority > b.order ? -1 : 1;
-    }
-    if (aDueDatetime && bDueDatetime) { 
-      return aDueDatetime > bDueDatetime ? -1 : 1;
-    }
-    if (aDueDatetime) {
-      return -1;
-    }
-      return 1;
-  });
+  const sortedTasks = sortByDueDateAndPriority(tasks || []);
 
   return (
     <Center className="flex-1">
-      {isLoading ? (<Spinner />) :
-      <FlatList style={{width: '100%'}} data={sortedTasks} renderItem={({item: task}) => <Text key={task.id}>{task.content}</Text>} />
-      }
+      {isLoading ? (
+        <Spinner />
+      ) : (
+        <FlatList
+          style={{ width: "100%" }}
+          data={sortedTasks}
+          renderItem={({ item: task }) => (
+            <Card key={task.id}>
+              <Text>{task.content}</Text>
+              <Text>{task.due?.date || ""}</Text>
+              <Text>{task.priority || ""}</Text>
+              <Text>
+                Duration:{" "}
+                {task.duration
+                  ? `${task.duration.amount}${task.duration.unit}`
+                  : "None"}
+              </Text>
+            </Card>
+          )}
+        />
+      )}
     </Center>
   );
 }

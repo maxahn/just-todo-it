@@ -1,7 +1,7 @@
 {
   "expo": {
-    "name": "test-expo",
-    "slug": "test-expo",
+    "name": "Task Focus",
+    "slug": "task-focus",
     "version": "1.0.0",
     "orientation": "portrait",
     "icon": "./assets/images/icon.png",
@@ -14,8 +14,9 @@
     "android": {
       "adaptiveIcon": {
         "foregroundImage": "./assets/images/adaptive-icon.png",
-        "backgroundColor": "#ffffff"
-      }
+        "backgroundColor": "#0F172A"
+      },
+      "package": "com.mxahn.taskfocus"
     },
     "web": {
       "bundler": "metro",
@@ -36,6 +37,20 @@
     ],
     "experiments": {
       "typedRoutes": true
+    },
+    "extra": {
+      "router": {
+        "origin": false
+      },
+      "eas": {
+        "projectId": "3056a6bf-da3d-47f9-b00c-bee57c1c38ea"
+      }
+    },
+    "runtimeVersion": {
+      "policy": "appVersion"
+    },
+    "updates": {
+      "url": "https://u.expo.dev/3056a6bf-da3d-47f9-b00c-bee57c1c38ea"
     }
   }
 }
