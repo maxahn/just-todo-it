@@ -74,7 +74,7 @@ export default function Home() {
     if (!activeMission) {
       initializeActiveMission();
     }
-  }, [tasks, todayOnly]);
+  }, [tasks, todayOnly, activeMission]);
 
   const handleRefetchTasks = async () => {
     await refetch();

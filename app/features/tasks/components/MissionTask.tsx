@@ -11,6 +11,7 @@ import { isToday } from "date-fns";
 import { isAfter } from "date-fns/isAfter";
 import { CheckIcon } from "lucide-react-native";
 import { useCompleteTaskMutation } from "../hooks/useCompleteTaskMutation";
+import { useActiveMission } from "../hooks/useActiveMission";
 
 type MissionTaskProps = {
   id: string;
@@ -54,10 +55,12 @@ export function MissionTask({
     : false;
 
   const { mutateAsync: completeTask, isPending } = useCompleteTaskMutation();
+  const { setActiveMission } = useActiveMission();
 
   const handleCompleteTask = async () => {
     try {
       await completeTask({ id });
+      setActiveMission(null);
     } catch (error) {
       console.log({ error });
     }
@@ -72,7 +75,7 @@ export function MissionTask({
           variant="outline"
           size="sm"
           className="rounded-full h-8 w-8"
-          disabled={isPending}
+          isDisabled={isPending}
           onPress={handleCompleteTask}
         >
           <ButtonIcon as={CheckIcon} />
