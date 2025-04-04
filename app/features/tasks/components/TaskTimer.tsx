@@ -40,6 +40,7 @@ export default function TaskTimer() {
     useCompleteTaskMutation();
   const {
     activeMission,
+    setActiveMission,
     sessions,
     getIsActive,
     toggleIsTaskPaused,
@@ -54,6 +55,7 @@ export default function TaskTimer() {
     try {
       if (!activeMission?.id) throw new Error("No active mission");
       await completeTask({ id: activeMission.id });
+      setActiveMission(null);
     } catch (error) {
       console.log({ error });
     }

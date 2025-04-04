@@ -1,5 +1,5 @@
 import React from "react";
-import { FlatList } from "react-native";
+import { FlatList, RefreshControl } from "react-native";
 import { Center } from "@/components/ui/center";
 import { Text } from "@/components/ui/text";
 import useTasksQuery from "@/app/features/tasks/hooks/useTasksQuery";
@@ -33,7 +33,7 @@ function getPriorityColor(priority: Priority): string {
 }
 
 export default function Home() {
-  const { data: tasks, isLoading } = useTasksQuery();
+  const { data: tasks, isLoading, refetch } = useTasksQuery();
 
   const sortedTasks = sortByDueDateAndPriority(tasks || []);
   const { setActiveMission } = useActiveMission();
@@ -52,6 +52,9 @@ export default function Home() {
           style={{ width: "100%" }}
           data={sortedTasks}
           ItemSeparatorComponent={() => <Box className="h-2" />}
+          refreshControl={
+            <RefreshControl refreshing={isLoading} onRefresh={refetch} />
+          }
           renderItem={({ item: task }) => {
             const isDueToday = task?.due?.date ? isToday(task.due.date) : false;
             return (

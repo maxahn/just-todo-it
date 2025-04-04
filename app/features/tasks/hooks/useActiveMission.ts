@@ -10,7 +10,7 @@ interface ActiveMissionState {
   distractionCounter: number;
   taskIdPriorityList: string[];
   setDistractionCounter: (distractionCounter: number) => void;
-  setActiveMission: (mission: Task) => void;
+  setActiveMission: (mission: Task | null) => void;
   clearSessions: () => void;
   getIsActive: () => boolean;
   sessions: Session[];
