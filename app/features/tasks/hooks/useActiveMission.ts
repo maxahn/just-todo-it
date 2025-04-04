@@ -8,6 +8,7 @@ type Session = [string, string | null]; // start and end timestamp, if null, not
 interface ActiveMissionState {
   activeMission: Task | null;
   distractionCounter: number;
+  taskIdPriorityList: string[];
   setDistractionCounter: (distractionCounter: number) => void;
   setActiveMission: (mission: Task) => void;
   clearSessions: () => void;
@@ -38,6 +39,7 @@ export const useActiveMission = create(
       activeMission: null,
       sessions: [],
       distractionCounter: 0,
+      taskIdPriorityList: [],
       setDistractionCounter: (distractionCounter) => {
         set((state) => ({ ...state, distractionCounter }));
       },

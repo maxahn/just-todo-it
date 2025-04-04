@@ -26,17 +26,16 @@ export default function TabLayout() {
           tabBarIcon: ({ color }) => <TabBarIcon name="list" color={color} />,
         }}
       />
-
       <Tabs.Screen
         name="index"
         options={{
           title: "Current Task",
-          headerShown: false,
           tabBarIcon: ({ color }) => (
             <TabBarIcon name="bullseye" color={color} />
           ),
         }}
       />
+
       <Tabs.Screen
         name="player"
         options={{

@@ -9,10 +9,10 @@ import { useTaskMutation } from "@/app/features/tasks/hooks/useTaskMutation";
 import TaskTimer from "@/app/features/tasks/components/TaskTimer";
 import { format } from "date-fns";
 import { DUE_DATE_FORMAT } from "@/app/util/date/FORMAT";
-import { VStack } from "@/components/ui/vstack";
 import { Switch } from "@/components/ui/switch";
 import { HStack } from "@/components/ui/hstack";
 import { ScreenWrapper } from "@/components/ui/wrapper/ScreenWrapper";
+import { VStack } from "@/components/ui/vstack";
 
 export default function Home() {
   const [deferOffset, setDeferOffset] = useState(0);
@@ -70,31 +70,35 @@ export default function Home() {
   }
 
   useEffect(() => {
-    initializeActiveMission();
+    if (!activeMission) {
+      initializeActiveMission();
+    }
   }, [tasks, todayOnly]);
 
   return (
     <ScreenWrapper>
-      {sessions?.length ? (
-        <TaskTimer />
-      ) : activeMission ? (
-        <>
-          <MissionTask
-            id={activeMission.id}
-            title={activeMission.content}
-            description={activeMission?.description}
-            due={activeMission.due}
-            duration={activeMission?.duration}
-            onStart={toggleIsTaskPaused}
-            onDefer={handleDefer}
-            onDecrementDuration={() => handleIncrementDuration(-5)}
-            onIncrementDuration={() => handleIncrementDuration(5)}
-          />
-        </>
-      ) : (
-        <Text>No tasks</Text>
-      )}
-      <HStack className="align-center gap-2 justify-end items-center">
+      <VStack className="flex flex-1 justify-center">
+        {sessions?.length ? (
+          <TaskTimer />
+        ) : activeMission ? (
+          <>
+            <MissionTask
+              id={activeMission.id}
+              title={activeMission.content}
+              description={activeMission?.description}
+              due={activeMission.due}
+              duration={activeMission?.duration}
+              onStart={toggleIsTaskPaused}
+              onDefer={handleDefer}
+              onDecrementDuration={() => handleIncrementDuration(-5)}
+              onIncrementDuration={() => handleIncrementDuration(5)}
+            />
+          </>
+        ) : (
+          <Text>No tasks</Text>
+        )}
+      </VStack>
+      <HStack className="flex-0 align-center gap-2 justify-end items-center py-3">
         <Text className="font-semibold">Today Only</Text>
         <Switch value={todayOnly} onToggle={setTodayOnly} />
       </HStack>
