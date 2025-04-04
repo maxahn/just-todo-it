@@ -1,4 +1,4 @@
-// import _ from "lodash";
+import { useKeepAwake } from "expo-keep-awake";
 import { MissionTask } from "@/app/features/tasks/components/MissionTask";
 import useTasksQuery from "@/app/features/tasks/hooks/useTasksQuery";
 import { Text } from "@/components/ui/text";
@@ -21,6 +21,7 @@ export default function Home() {
   const { activeMission, sessions, setActiveMission, toggleIsTaskPaused } =
     useActiveMission();
   const { mutateAsync: updateTask } = useTaskMutation();
+  useKeepAwake();
 
   async function handleIncrementDuration(amount: number) {
     // const oldActiveMission = activeMission;
