@@ -7,12 +7,6 @@ export function parseFromDateString(date: string) {
 
 export function getHumanReadableDate(dateStr: string): string {
   const date = parseFromDateString(dateStr);
-  console.log({
-    date,
-    isToday: isToday(date),
-    isTomorrow: isTomorrow(date),
-    isThisWeek: isThisWeek(date),
-  });
   if (isToday(date)) {
     return "Today";
   }

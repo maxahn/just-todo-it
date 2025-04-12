@@ -1,18 +1,23 @@
-import EditScreenInfo from "@/components/EditScreenInfo";
-import { Center } from "@/components/ui/center";
-import { Divider } from "@/components/ui/divider";
-import { Heading } from "@/components/ui/heading";
-import { Text } from "@/components/ui/text";
-import { VStack } from "@/components/ui/vstack";
+import { ScreenWrapper } from "@/components/ui/wrapper/ScreenWrapper";
+import { AuthTokenForm } from "@/features/authentication/components/AuthTokenForm";
+import { getAuthToken } from "@/features/authentication/util/getAuthToken";
+import { useEffect, useState } from "react";
 
 export default function Player() {
+  const [apiKey, setApiKey] = useState("");
+
+  const loadApiKey = async () => {
+    const key = await getAuthToken();
+    setApiKey(key || "");
+  };
+
+  useEffect(() => {
+    loadApiKey();
+  }, []);
+
   return (
-    <Center className="flex-1 p-8">
-      <VStack>
-        <Text className="text-xl font-bold">
-          TODOIST KEY: {process.env.EXPO_PUBLIC_TODOIST_API_KEY}
-        </Text>
-      </VStack>
-    </Center>
+    <ScreenWrapper>
+      <AuthTokenForm value={apiKey} onChangeText={setApiKey} />
+    </ScreenWrapper>
   );
 }

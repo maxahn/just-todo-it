@@ -1,4 +1,4 @@
-import { sortByDueDateAndPriority } from "../app/features/tasks/utils/sortTasks";
+import { sortByDueDateAndPriority } from "../features/tasks/utils/sortTasks";
 import {
   DUE_TODAY,
   DUE_TOMORROW,

@@ -17,7 +17,6 @@ let routes = {
   authApiUrl: process.env.AUTH_API_URL,
   apiUrl: process.env.API_URL,
 };
-console.log({ CHANNEL: process.env.CHANNEL });
 
 switch (process.env.CHANNEL) {
   case CHANNELS.Development:

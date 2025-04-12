@@ -1,7 +1,7 @@
 import {
   getHumanReadableDate,
   parseFromDateString,
-} from "@/app/util/date/parseFromDate";
+} from "@/util/date/parseFromDate";
 import { Button, ButtonIcon, ButtonText } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { HStack } from "@/components/ui/hstack";

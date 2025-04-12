@@ -7,12 +7,13 @@ import {
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { useFonts } from "expo-font";
 import * as SplashScreen from "expo-splash-screen";
-import { useEffect, useState } from "react";
+import { useEffect, useLayoutEffect, useState } from "react";
 import { GluestackUIProvider } from "@/components/ui/gluestack-ui-provider";
 import { useColorScheme } from "@/components/useColorScheme";
 import { Slot } from "expo-router";
 
 import "../global.css";
+import AuthProvider from "../features/authentication/contexts/AuthProvider";
 
 const queryClient = new QueryClient();
 export {
@@ -46,13 +47,13 @@ export default function RootLayout() {
     }
   }, [loaded]);
 
-  // useLayoutEffect(() => {
-  //   setStyleLoaded(true);
-  // }, [styleLoaded]);
+  useLayoutEffect(() => {
+    setStyleLoaded(true);
+  }, [styleLoaded]);
 
-  // if (!loaded || !styleLoaded) {
-  //   return null;
-  // }
+  if (!loaded || !styleLoaded) {
+    return null;
+  }
 
   return <RootLayoutNav />;
 }
@@ -61,14 +62,16 @@ function RootLayoutNav() {
   const colorScheme = useColorScheme();
 
   return (
-    <QueryClientProvider client={queryClient}>
-      <GluestackUIProvider mode={"dark"}>
-        <ThemeProvider
-          value={colorScheme === "dark" ? DarkTheme : DefaultTheme}
-        >
-          <Slot />
-        </ThemeProvider>
-      </GluestackUIProvider>
-    </QueryClientProvider>
+    <AuthProvider>
+      <QueryClientProvider client={queryClient}>
+        <GluestackUIProvider mode={"dark"}>
+          <ThemeProvider
+            value={colorScheme === "dark" ? DarkTheme : DefaultTheme}
+          >
+            <Slot />
+          </ThemeProvider>
+        </GluestackUIProvider>
+      </QueryClientProvider>
+    </AuthProvider>
   );
 }

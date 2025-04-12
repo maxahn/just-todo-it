@@ -1,6 +1,6 @@
 import { format } from "date-fns";
-import { Task } from "../app/features/tasks/types";
-import { DUE_DATE_FORMAT } from "@/app/util/date/FORMAT";
+import { Task } from "../features/tasks/types";
+import { DUE_DATE_FORMAT } from "@/util/date/FORMAT";
 const TODAY = new Date();
 const TOMORROW = new Date(Date.now() + 24 * 60 * 60 * 1000);
 

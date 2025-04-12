@@ -2,18 +2,18 @@ import React from "react";
 import { FlatList, RefreshControl } from "react-native";
 import { Center } from "@/components/ui/center";
 import { Text } from "@/components/ui/text";
-import useTasksQuery from "@/app/features/tasks/hooks/useTasksQuery";
+import useTasksQuery from "@/features/tasks/hooks/useTasksQuery";
 import { Spinner } from "@/components/ui/spinner";
-import { sortByDueDateAndPriority } from "@/app/features/tasks/utils/sortTasks";
+import { sortByDueDateAndPriority } from "@/features/tasks/utils/sortTasks";
 import { Card } from "@/components/ui/card";
 import { Box } from "@/components/ui/box";
 import { HStack } from "@/components/ui/hstack";
 import { VStack } from "@/components/ui/vstack";
-import { Priority, Task } from "@/app/features/tasks/types";
-import { isToday } from "@/app/util/date/isToday";
+import { Priority, Task } from "@/features/tasks/types";
+import { isToday } from "@/util/date/isToday";
 import { Button, ButtonIcon } from "@/components/ui/button";
 import { Target } from "lucide-react-native";
-import { useActiveMission } from "@/app/features/tasks/hooks/useActiveMission";
+import { useActiveMission } from "@/features/tasks/hooks/useActiveMission";
 import { useRouter } from "expo-router";
 
 function getPriorityColor(priority: Priority): string {
@@ -34,6 +34,7 @@ function getPriorityColor(priority: Priority): string {
 
 export default function Home() {
   const { data: tasks, isLoading, refetch } = useTasksQuery();
+  console.log({ tasks });
 
   const sortedTasks = sortByDueDateAndPriority(tasks || []);
   const { setActiveMission } = useActiveMission();

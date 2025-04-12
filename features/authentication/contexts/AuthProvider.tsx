@@ -8,14 +8,14 @@ interface AuthContext {
   initializeAuthState: (token?: string) => Promise<void>;
 }
 
-const AuthContext = createContext<AuthContext>({
+export const AuthContext = createContext<AuthContext>({
   isInitialized: false,
   isLoggedIn: false,
   authToken: null,
   initializeAuthState: async () => {},
 });
 
-export default function AuthProviderContext(
+export default function AuthProvider(
   props: Omit<ProviderProps<AuthContext>, "value">,
 ) {
   const [isInitialized, setIsInitialized] = useState(false);
@@ -23,15 +23,10 @@ export default function AuthProviderContext(
   const [authToken, setAuthToken] = useState<string | null>(null);
 
   const initializeAuthState = async (initToken?: string) => {
-    setIsInitialized(true);
-    if (initToken) {
-      setAuthToken(initToken);
-      setIsLoggedIn(Boolean(initToken));
-      return;
-    }
-    const token = await getAuthToken();
+    const token = initToken ? initToken : await getAuthToken();
     setAuthToken(token);
     setIsLoggedIn(Boolean(token));
+    setIsInitialized(true);
   };
 
   useEffect(() => {
