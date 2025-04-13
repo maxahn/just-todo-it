@@ -35,6 +35,15 @@ export default function TabLayout() {
           ),
         }}
       />
+      <Tabs.Screen
+        name="summary/index"
+        options={{
+          title: "Summary",
+          tabBarIcon: ({ color }) => (
+            <TabBarIcon name="bar-chart-o" color={color} />
+          ),
+        }}
+      />
 
       <Tabs.Screen
         name="player"

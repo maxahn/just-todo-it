@@ -8,9 +8,7 @@ const useTasksQuery = (options?: QueryOptions<TasksResponse>) =>
   useQuery<TasksResponse>({
     queryKey: ["tasks"],
     queryFn: async () => {
-      const result = await authenticatedFetch<TasksResponse>(`/tasks`);
-      console.log({ result });
-      return result;
+      return await authenticatedFetch<TasksResponse>(`/tasks`);
     },
     ...options,
   });

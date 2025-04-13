@@ -87,7 +87,7 @@ export function MissionTask({
           <HStack className="gap-2">
             <Text
               size="sm"
-              className={`text-right font-bold mt-2 ${overdue ? "text-red-600" : "text-green-500"}`}
+              className={`text-right font-bold mt-2 ${overdue ? "text-error-600" : "text-success-500"} `}
             >
               {getHumanReadableDate(due.date)}
             </Text>

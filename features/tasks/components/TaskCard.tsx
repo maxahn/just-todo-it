@@ -7,6 +7,7 @@ import { Text } from "@/components/ui/text";
 import { getPriorityColor } from "../utils/getPriorityColor";
 import { PlayIcon } from "lucide-react-native";
 import { getHumanReadableDate } from "@/util/date/parseFromDate";
+import { formatUnit } from "../utils/formatUnit";
 
 interface TaskCardProps extends ICardProps {
   task: Task;
@@ -31,12 +32,12 @@ export function TaskCard({
           <Text>
             {task.due?.date ? getHumanReadableDate(task.due?.date) : ""}
           </Text>
-          <Text>
-            Duration:{" "}
-            {task.duration
-              ? `${task.duration.amount}${task.duration.unit}`
-              : "None"}
-          </Text>
+          {task.duration ? (
+            <Text>
+              Duration: {task.duration.amount}
+              {formatUnit(task.duration.unit)}
+            </Text>
+          ) : null}
         </VStack>
         {onPressAction ? (
           <VStack className="justify-center flex-0">
