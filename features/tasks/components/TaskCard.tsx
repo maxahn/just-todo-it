@@ -6,6 +6,7 @@ import { VStack } from "@/components/ui/vstack";
 import { Text } from "@/components/ui/text";
 import { getPriorityColor } from "../utils/getPriorityColor";
 import { PlayIcon } from "lucide-react-native";
+import { getHumanReadableDate } from "@/util/date/parseFromDate";
 
 interface TaskCardProps extends ICardProps {
   task: Task;
@@ -27,7 +28,9 @@ export function TaskCard({
       <HStack className="flex justify-between">
         <VStack className="flex-1">
           <Text className=" text-2xl font-bold">{task.content}</Text>
-          <Text>{task.due?.date || ""}</Text>
+          <Text>
+            {task.due?.date ? getHumanReadableDate(task.due?.date) : ""}
+          </Text>
           <Text>
             Duration:{" "}
             {task.duration

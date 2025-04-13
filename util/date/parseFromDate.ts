@@ -1,4 +1,12 @@
-import { format, isThisWeek, isToday, isTomorrow, parse } from "date-fns";
+import {
+  Day,
+  format,
+  getDay,
+  isThisWeek,
+  isToday,
+  isTomorrow,
+  parse,
+} from "date-fns";
 import { DUE_DATE_FORMAT } from "./FORMAT";
 
 export function parseFromDateString(date: string) {
@@ -13,7 +21,8 @@ export function getHumanReadableDate(dateStr: string): string {
   if (isTomorrow(date)) {
     return "Tomorrow";
   }
-  if (isThisWeek(date)) {
+  const day = getDay(new Date()) as Day;
+  if (isThisWeek(date, { weekStartsOn: day })) {
     return format(date, "EEEE");
   }
   return format(date, "MMM d, yyyy");

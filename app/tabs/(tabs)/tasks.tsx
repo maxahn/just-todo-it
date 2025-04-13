@@ -12,7 +12,6 @@ import { TaskCard } from "@/features/tasks/components/TaskCard";
 
 export default function Home() {
   const { data: tasks, isLoading, refetch } = useTasksQuery();
-  console.log({ tasks });
 
   const sortedTasks = sortByDueDateAndPriority(tasks || []);
   const { setActiveMission } = useActiveMission();
