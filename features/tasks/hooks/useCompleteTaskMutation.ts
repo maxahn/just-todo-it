@@ -24,20 +24,6 @@ export const useCompleteTaskMutation = (
     mutationFn: async ({
       id,
     }: TaskMutationArgs): Promise<TaskMutationResponse> => {
-      // const response = await fetch(
-      //   `https://api.todoist.com/rest/v2/tasks/${id}/close`,
-      //   {
-      //     method: "POST",
-      //     headers: {
-      //       Authorization: `Bearer ${process.env.EXPO_PUBLIC_TODOIST_API_KEY}`,
-      //       "Content-Type": "application/json",
-      //     },
-      //   },
-      // );
-      // if (!response.ok) {
-      //   throw new Error("Network response was not ok");
-      // }
-
       await authenticatedPost(
         `https://api.todoist.com/rest/v2/tasks/${id}/close`,
       );

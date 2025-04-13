@@ -1,36 +1,14 @@
 import React from "react";
 import { FlatList, RefreshControl } from "react-native";
 import { Center } from "@/components/ui/center";
-import { Text } from "@/components/ui/text";
 import useTasksQuery from "@/features/tasks/hooks/useTasksQuery";
 import { Spinner } from "@/components/ui/spinner";
 import { sortByDueDateAndPriority } from "@/features/tasks/utils/sortTasks";
-import { Card } from "@/components/ui/card";
 import { Box } from "@/components/ui/box";
-import { HStack } from "@/components/ui/hstack";
-import { VStack } from "@/components/ui/vstack";
-import { Priority, Task } from "@/features/tasks/types";
-import { isToday } from "@/util/date/isToday";
-import { Button, ButtonIcon } from "@/components/ui/button";
-import { Target } from "lucide-react-native";
+import { Task } from "@/features/tasks/types";
 import { useActiveMission } from "@/features/tasks/hooks/useActiveMission";
 import { useRouter } from "expo-router";
-
-function getPriorityColor(priority: Priority): string {
-  switch (priority) {
-    case 1:
-      return "bg-transparent";
-    case 2:
-      return "bg-blue-500";
-    case 3:
-      return "bg-orange-500";
-    case 4:
-      return "bg-red-600";
-      break;
-    default:
-      return "bg-white";
-  }
-}
+import { TaskCard } from "@/features/tasks/components/TaskCard";
 
 export default function Home() {
   const { data: tasks, isLoading, refetch } = useTasksQuery();
@@ -56,39 +34,12 @@ export default function Home() {
           refreshControl={
             <RefreshControl refreshing={isLoading} onRefresh={refetch} />
           }
-          renderItem={({ item: task }) => {
-            const isDueToday = task?.due?.date ? isToday(task.due.date) : false;
-            return (
-              <Card
-                key={task.id}
-                className={isDueToday ? `border-l-4 border-orange-500` : ""}
-              >
-                <HStack className="flex justify-between">
-                  <VStack>
-                    <Text className="text-2xl font-bold">{task.content}</Text>
-                    <Text>{task.due?.date || ""}</Text>
-                    <Text>
-                      Duration:{" "}
-                      {task.duration
-                        ? `${task.duration.amount}${task.duration.unit}`
-                        : "None"}
-                    </Text>
-                  </VStack>
-                  <VStack className="items-end justify-between">
-                    <Box
-                      className={`${getPriorityColor(task.priority)} h-2 w-2 rounded-full`}
-                    />
-                    <Button
-                      action="primary"
-                      onPress={() => handleSetActiveTask(task)}
-                    >
-                      <ButtonIcon as={Target} size="lg" color="white" />
-                    </Button>
-                  </VStack>
-                </HStack>
-              </Card>
-            );
-          }}
+          renderItem={({ item: task }) => (
+            <TaskCard
+              task={task}
+              onPressAction={() => handleSetActiveTask(task)}
+            />
+          )}
         />
       )}
     </Center>
