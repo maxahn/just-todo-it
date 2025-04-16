@@ -18,6 +18,7 @@ export type TodoistTask = {
   } | null;
   deadline: {
     date: string; // "2016-09-04"
+    lang: string;
   } | null;
   duration: {
     amount: number;
@@ -43,16 +44,17 @@ export type Task = {
   dueString?: string;
   dueTimezone?: string;
   deadlineDate?: string;
+  deadlineLang?: string;
   durationAmount?: number;
-  durationUnit?: string;
+  durationUnit?: "minute" | "day";
   order: number;
   priority: Priority;
   projectId?: string;
-  sectionId: string | null;
-  parentId: string | null;
+  sectionId?: string;
+  parentId?: string;
   url?: string;
-  assigneeId: string | null;
-  assignerId: string | null;
+  assigneeId?: string;
+  assignerId?: string;
   commentCount: number;
   // custom non-TODOist fields
   estimatedDuration?: number; // in minutes
@@ -60,21 +62,7 @@ export type Task = {
   difficulty?: number;
 };
 
-export type TaskUpdate = {
-  content?: string;
-  description?: string;
-  labels?: string[];
-  priority?: Priority;
-  due_date?: string;
-  due_datetime?: string;
-  due_string?: string;
-  due_lang?: string;
-  assignee_id?: string;
-  duration?: number;
-  duration_unit?: "minute" | "day";
-  deadline_date?: string;
-  deadline_lang?: string; // 2-letter code specifying language
-};
+export type TaskUpdate = Partial<Omit<Task, "id" | "createdAt">>;
 
 export type Session = {
   id: string;

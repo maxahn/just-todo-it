@@ -7,7 +7,7 @@ export const TASK_TABLE_ID = "tasks";
 export const store = createMergeableStore(SESSION_TABLE_ID);
 
 store.setValuesSchema({
-  activeTaskId: { type: "string" },
+  activeTaskId: { type: "string", default: "" },
 });
 
 store.setTablesSchema({
@@ -30,7 +30,7 @@ store.setTablesSchema({
     sectionId: { type: "string" },
     url: { type: "string" },
     // custom non-TODOist fields
-    estimatedDuration: { type: "number" }, // in minutes
+    estimatedDuration: { type: "number", default: 25 }, // in minutes
     anxietyLevel: { type: "number" },
     difficulty: { type: "number" },
   },

@@ -1,11 +1,13 @@
 import { syncTasksFromApi } from "@/store/util/syncTasksFromApi";
-import { Session } from "../types";
+import { Session, TaskUpdate } from "../types";
 import { createContext, ProviderProps, useEffect, useState } from "react";
-import { useStore } from "tinybase/ui-react";
+import { useStore, useValue } from "tinybase/ui-react";
+import { TASK_TABLE_ID } from "@/store";
 
 export interface TasksContextState {
-  activeTaskId: string | undefined;
-  setActiveTaskId: (id: string | undefined) => void;
+  activeTaskId: string;
+  setActiveTaskId: (id: string) => void;
+  updateTask: (id: string, update: TaskUpdate) => void;
   clearSessions: () => void;
   getIsActive: () => boolean;
   sessions: Session[];
@@ -17,8 +19,9 @@ export interface TasksContextState {
 }
 
 export const TasksContext = createContext<TasksContextState>({
-  activeTaskId: undefined,
+  activeTaskId: "",
   setActiveTaskId: () => {},
+  updateTask: () => {},
   clearSessions: () => {},
   getIsActive: () => false,
   sessions: [],
@@ -34,8 +37,8 @@ export function TasksProvider(
 ) {
   const [isSyncing, setIsSyncing] = useState(false);
   const store = useStore();
-
-  const activeTaskId = store?.getValue("activeTaskId") as string | undefined;
+  const activeTaskId = useValue("activeTaskId");
+  // const tasksTable = useTable(TASK_TABLE_ID)
 
   const handleFetchAndSyncTasks = async () => {
     try {
@@ -43,6 +46,14 @@ export function TasksProvider(
     } finally {
       setIsSyncing(false);
     }
+  };
+
+  const setActiveTaskId = (id: string) => {
+    store?.setValue("activeTaskId", id);
+  };
+
+  const updateTask = (id: string, update: TaskUpdate) => {
+    store?.setPartialRow(TASK_TABLE_ID, id, update);
   };
 
   useEffect(() => {
@@ -53,8 +64,9 @@ export function TasksProvider(
     <TasksContext.Provider
       value={{
         isSyncing,
-        activeTaskId,
-        setActiveTaskId: () => {},
+        activeTaskId: activeTaskId as string,
+        setActiveTaskId,
+        updateTask,
         clearSessions: () => {},
         getIsActive: () => false,
         sessions: [],

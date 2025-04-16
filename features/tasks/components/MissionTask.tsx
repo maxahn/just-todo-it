@@ -12,59 +12,47 @@ import { isAfter } from "date-fns/isAfter";
 import { CheckIcon } from "lucide-react-native";
 import { useCompleteTaskMutation } from "../hooks/useCompleteTaskMutation";
 import { useActiveMission } from "../hooks/useActiveMission";
+import { useRow } from "tinybase/ui-react";
+import { TASK_TABLE_ID } from "@/store";
+import type { Task } from "../types";
 
 type MissionTaskProps = {
   id: string;
-  title: string;
-  description: string;
-  due?: {
-    date: string;
-    is_recurring: boolean;
-    datetime?: string;
-    string?: string;
-    timezone?: string;
-  } | null;
-  duration?: {
-    amount: number;
-    unit: string;
-  } | null;
-  anxietyLevel?: number;
-  difficultyLevel?: number;
   onStart: () => void;
   onDefer: () => void;
-  onIncrementDuration: () => Promise<void> | undefined;
-  onDecrementDuration: () => Promise<void> | undefined;
 };
 
-export function MissionTask({
-  id,
-  title,
-  description,
-  due,
-  duration,
-  onIncrementDuration,
-  onDecrementDuration,
-  onStart,
-  onDefer,
-  anxietyLevel,
-  difficultyLevel,
-}: MissionTaskProps) {
-  const dueDate = due?.date ? parseFromDateString(due.date) : null;
+export function MissionTask({ id, onStart, onDefer }: MissionTaskProps) {
+  const task = useRow(TASK_TABLE_ID, id) as Task;
+  console.log({ task });
+  const { content, description, durationAmount, durationUnit } = task;
+  const dueDate = task?.dueDate ? parseFromDateString(task.dueDate) : null;
   const overdue = dueDate
     ? isAfter(dueDate, new Date().setHours(0, 0, 0, 0)) || !isToday(dueDate)
     : false;
 
   const { mutateAsync: completeTask, isPending } = useCompleteTaskMutation();
-  const { setActiveMission } = useActiveMission();
+  const { setActiveTaskId, updateTask } = useActiveMission();
 
   const handleCompleteTask = async () => {
     try {
       await completeTask({ id });
-      setActiveMission(null);
+      setActiveTaskId(null);
     } catch (error) {
       console.log({ error });
     }
   };
+  async function handleIncrementDuration(amount: number) {
+    try {
+      if (!task) return;
+      const updatedDuration = (durationAmount || 25) + amount;
+      await updateTask(id, {
+        durationAmount: updatedDuration,
+      });
+    } catch (error) {
+      console.log({ error });
+    }
+  }
 
   return (
     <Card className="rounded-xl p-6 gap-4" variant="filled">
@@ -82,14 +70,14 @@ export function MissionTask({
         </Button>
       </HStack>
       <Card className="rounded-xl p-6 mt-3 ">
-        <Text className="text-xl font-bold">{title}</Text>
-        {due ? (
+        <Text className="text-xl font-bold">{content}</Text>
+        {task?.dueDate ? (
           <HStack className="gap-2">
             <Text
               size="sm"
               className={`text-right font-bold mt-2 ${overdue ? "text-error-600" : "text-success-500"} `}
             >
-              {getHumanReadableDate(due.date)}
+              {getHumanReadableDate(task.dueDate)}
             </Text>
           </HStack>
         ) : null}
@@ -104,17 +92,19 @@ export function MissionTask({
         <HStack className="gap-2 items-center">
           <Button
             className="rounded-full w-1"
-            onPress={onDecrementDuration}
+            onPress={() => handleIncrementDuration(-5)}
             action="tertiary"
           >
             <ButtonIcon as={RemoveIcon} />
           </Button>
           <Text className="font-bold">
-            {duration ? `${duration.amount} ${duration.unit}` : "25m"}
+            {durationAmount && durationUnit
+              ? `${durationAmount} ${durationUnit}`
+              : "25m"}
           </Text>
           <Button
             className="rounded-full w-1"
-            onPress={onIncrementDuration}
+            onPress={() => handleIncrementDuration(5)}
             action="tertiary"
           >
             <ButtonIcon as={AddIcon} />
