@@ -25,27 +25,32 @@ type MissionTaskProps = {
 export function MissionTask({ id, onStart, onDefer }: MissionTaskProps) {
   const task = useRow(TASK_TABLE_ID, id) as Task;
   const taskExtra = useRow(TASK_EXTRA_TABLE_ID, id) as TaskExtra;
-  const { content, description, durationAmount } = task;
+  const { content, description } = task;
   const dueDate = task?.dueDate ? parseFromDateString(task.dueDate) : null;
   const overdue = dueDate
     ? isAfter(dueDate, new Date().setHours(0, 0, 0, 0)) || !isToday(dueDate)
     : false;
 
   const { mutateAsync: completeTask, isPending } = useCompleteTaskMutation();
-  const { setActiveTaskId, updateTaskExtra } = useActiveMission();
+  const { setActiveTaskId, updateTask, updateTaskExtra } = useActiveMission();
 
   const handleCompleteTask = async () => {
     try {
       await completeTask({ id });
+      // TODO: sync local tasks to todoist
+      await updateTask(id, {
+        isCompleted: true,
+      });
       setActiveTaskId("");
     } catch (error) {
       console.log({ error });
     }
   };
+
   async function handleIncrementDuration(amount: number) {
     try {
-      if (!task) return;
-      const updatedDuration = (durationAmount || 25) + amount;
+      if (!taskExtra) return;
+      const updatedDuration = (taskExtra.estimatedDuration || 25) + amount;
       await updateTaskExtra(id, {
         estimatedDuration: updatedDuration,
       });

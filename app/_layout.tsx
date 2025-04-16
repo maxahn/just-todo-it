@@ -16,6 +16,7 @@ import { Provider as TinyBaseProvider } from "tinybase/ui-react";
 import "../global.css";
 import AuthProvider from "../features/authentication/contexts/AuthProvider";
 import { store } from "@/store";
+import { queries } from "@/store/queries";
 import { useAndStartPersister } from "@/store/hooks/useAndStartPersister";
 import { TasksProvider } from "@/features/tasks/contexts/TasksContext";
 
@@ -68,7 +69,7 @@ function RootLayoutNav() {
 
   return (
     <AuthProvider>
-      <TinyBaseProvider store={store}>
+      <TinyBaseProvider store={store} queries={queries}>
         <QueryClientProvider client={queryClient}>
           <TasksProvider>
             <GluestackUIProvider mode={"dark"}>

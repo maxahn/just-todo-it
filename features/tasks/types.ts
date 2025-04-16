@@ -20,10 +20,10 @@ export type TodoistTask = {
     date: string; // "2016-09-04"
     lang: string;
   } | null;
-  duration: {
-    amount: number;
-    unit: "minute" | "day"; // "minute"
-  } | null;
+  // duration: {
+  //   amount: number;
+  //   unit: "minute" | "day"; // "minute"
+  // } | null;
   labels: string[]; // ["Food", "Shopping"],
   order: number;
   priority: Priority;
@@ -45,8 +45,8 @@ export type Task = {
   dueTimezone?: string;
   deadlineDate?: string;
   deadlineLang?: string;
-  durationAmount?: number;
-  durationUnit?: "minute" | "day";
+  // durationAmount?: number;
+  // durationUnit?: "minute" | "day";
   order: number;
   priority: Priority;
   projectId?: string;
