@@ -1,7 +1,7 @@
 import { isAfter } from "date-fns";
-import { Task } from "../types";
+import { TodoistTask } from "../types";
 
-export function sortByDueDateAndPriority(tasks: Task[]): Task[] {
+export function sortByDueDateAndPriority(tasks: TodoistTask[]): TodoistTask[] {
   const sortedTasks = tasks.sort((a, b) => {
     const aDue = a.due;
     const bDue = b.due;

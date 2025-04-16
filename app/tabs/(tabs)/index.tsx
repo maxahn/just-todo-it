@@ -28,13 +28,13 @@ export default function Home() {
     try {
       if (!activeMission) return;
       const updatedDuration = (activeMission?.duration?.amount || 25) + amount;
-      setActiveMission({
-        ...activeMission,
-        duration: {
-          amount: updatedDuration,
-          unit: activeMission?.duration?.unit || "minute",
-        },
-      });
+      // setActiveMission({
+      //   ...activeMission,
+      //   duration: {
+      //     amount: updatedDuration,
+      //     unit: activeMission?.duration?.unit || "minute",
+      //   },
+      // });
       await updateTask({
         id: activeMission.id,
         taskChange: {
@@ -56,12 +56,12 @@ export default function Home() {
     }
     const sortedTasks = sortByDueDateAndPriority(tasks);
     const today = format(new Date(), DUE_DATE_FORMAT);
-    const filteredTasks = todayOnly
-      ? sortedTasks.filter((task) => {
-          return task.due?.date === today;
-        })
-      : sortedTasks;
-    setActiveMission(filteredTasks[0 + deferOffset]);
+    // const filteredTasks = todayOnly
+    //   ? sortedTasks.filter((task) => {
+    //       return task.due?.date === today;
+    //     })
+    //   : sortedTasks;
+    // setActiveMission(filteredTasks[0 + deferOffset]);
   }
 
   function handleDefer() {

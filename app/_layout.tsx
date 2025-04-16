@@ -11,9 +11,13 @@ import { useEffect, useLayoutEffect, useState } from "react";
 import { GluestackUIProvider } from "@/components/ui/gluestack-ui-provider";
 import { useColorScheme } from "@/components/useColorScheme";
 import { Slot } from "expo-router";
+import { Provider as TinyBaseProvider } from "tinybase/ui-react";
 
 import "../global.css";
 import AuthProvider from "../features/authentication/contexts/AuthProvider";
+import { store } from "@/store";
+import { useAndStartPersister } from "@/store/hooks/useAndStartPersister";
+import { TasksProvider } from "@/features/tasks/contexts/TasksContext";
 
 const queryClient = new QueryClient();
 export {
@@ -60,18 +64,23 @@ export default function RootLayout() {
 
 function RootLayoutNav() {
   const colorScheme = useColorScheme();
+  useAndStartPersister(store);
 
   return (
     <AuthProvider>
-      <QueryClientProvider client={queryClient}>
-        <GluestackUIProvider mode={"dark"}>
-          <ThemeProvider
-            value={colorScheme === "dark" ? DarkTheme : DefaultTheme}
-          >
-            <Slot />
-          </ThemeProvider>
-        </GluestackUIProvider>
-      </QueryClientProvider>
+      <TinyBaseProvider store={store}>
+        <QueryClientProvider client={queryClient}>
+          <TasksProvider>
+            <GluestackUIProvider mode={"dark"}>
+              <ThemeProvider
+                value={colorScheme === "dark" ? DarkTheme : DefaultTheme}
+              >
+                <Slot />
+              </ThemeProvider>
+            </GluestackUIProvider>
+          </TasksProvider>
+        </QueryClientProvider>
+      </TinyBaseProvider>
     </AuthProvider>
   );
 }
