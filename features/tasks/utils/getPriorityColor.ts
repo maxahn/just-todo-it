@@ -9,8 +9,7 @@ export function getPriorityColor(priority: Priority): string {
     case 3:
       return "orange-500";
     case 4:
-      return "red-600";
-      break;
+      return "error-500";
     default:
       return "white";
   }

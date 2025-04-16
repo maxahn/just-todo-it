@@ -3,6 +3,7 @@ import { createMergeableStore } from "tinybase/mergeable-store";
 export const SESSION_TABLE_ID = "sessions";
 export const DISTRACTION_TABLE_ID = "distractions";
 export const TASK_TABLE_ID = "tasks";
+export const TASK_EXTRA_TABLE_ID = "tasks_extra";
 
 export const store = createMergeableStore(SESSION_TABLE_ID);
 
@@ -29,7 +30,8 @@ store.setTablesSchema({
     projectId: { type: "string" },
     sectionId: { type: "string" },
     url: { type: "string" },
-    // custom non-TODOist fields
+  },
+  [TASK_EXTRA_TABLE_ID]: {
     estimatedDuration: { type: "number", default: 25 }, // in minutes
     anxietyLevel: { type: "number" },
     difficulty: { type: "number" },

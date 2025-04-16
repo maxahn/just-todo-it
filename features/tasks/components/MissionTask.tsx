@@ -13,8 +13,8 @@ import { CheckIcon } from "lucide-react-native";
 import { useCompleteTaskMutation } from "../hooks/useCompleteTaskMutation";
 import { useActiveMission } from "../hooks/useActiveMission";
 import { useRow } from "tinybase/ui-react";
-import { TASK_TABLE_ID } from "@/store";
-import type { Task } from "../types";
+import { TASK_EXTRA_TABLE_ID, TASK_TABLE_ID } from "@/store";
+import type { Task, TaskExtra } from "../types";
 
 type MissionTaskProps = {
   id: string;
@@ -24,20 +24,20 @@ type MissionTaskProps = {
 
 export function MissionTask({ id, onStart, onDefer }: MissionTaskProps) {
   const task = useRow(TASK_TABLE_ID, id) as Task;
-  console.log({ task });
-  const { content, description, durationAmount, durationUnit } = task;
+  const taskExtra = useRow(TASK_EXTRA_TABLE_ID, id) as TaskExtra;
+  const { content, description, durationAmount } = task;
   const dueDate = task?.dueDate ? parseFromDateString(task.dueDate) : null;
   const overdue = dueDate
     ? isAfter(dueDate, new Date().setHours(0, 0, 0, 0)) || !isToday(dueDate)
     : false;
 
   const { mutateAsync: completeTask, isPending } = useCompleteTaskMutation();
-  const { setActiveTaskId, updateTask } = useActiveMission();
+  const { setActiveTaskId, updateTaskExtra } = useActiveMission();
 
   const handleCompleteTask = async () => {
     try {
       await completeTask({ id });
-      setActiveTaskId(null);
+      setActiveTaskId("");
     } catch (error) {
       console.log({ error });
     }
@@ -46,8 +46,8 @@ export function MissionTask({ id, onStart, onDefer }: MissionTaskProps) {
     try {
       if (!task) return;
       const updatedDuration = (durationAmount || 25) + amount;
-      await updateTask(id, {
-        durationAmount: updatedDuration,
+      await updateTaskExtra(id, {
+        estimatedDuration: updatedDuration,
       });
     } catch (error) {
       console.log({ error });
@@ -98,8 +98,8 @@ export function MissionTask({ id, onStart, onDefer }: MissionTaskProps) {
             <ButtonIcon as={RemoveIcon} />
           </Button>
           <Text className="font-bold">
-            {durationAmount && durationUnit
-              ? `${durationAmount} ${durationUnit}`
+            {taskExtra?.estimatedDuration
+              ? `${taskExtra?.estimatedDuration}m`
               : "25m"}
           </Text>
           <Button

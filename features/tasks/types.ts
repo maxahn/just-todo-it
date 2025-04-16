@@ -56,11 +56,15 @@ export type Task = {
   assigneeId?: string;
   assignerId?: string;
   commentCount: number;
-  // custom non-TODOist fields
-  estimatedDuration?: number; // in minutes
-  anxietyLevel?: number;
-  difficulty?: number;
 };
+
+export type TaskExtra = {
+  estimatedDuration: number; // in minutes
+  anxietyLevel: number;
+  difficulty: number;
+};
+
+export type TaskExtraUpdate = Partial<TaskExtra>;
 
 export type TaskUpdate = Partial<Omit<Task, "id" | "createdAt">>;
 

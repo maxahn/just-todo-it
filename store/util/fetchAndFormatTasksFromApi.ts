@@ -15,11 +15,11 @@ function formatTask(task: TodoistTask): Task {
     url: task.url,
     createdAt: task.created_at,
     projectId: task.project_id,
-    sectionId: task.section_id,
-    parentId: task.parent_id,
+    sectionId: task.section_id ?? undefined,
+    parentId: task.parent_id ?? undefined,
     order: task.order,
-    assigneeId: task.assignee_id,
-    assignerId: task.assigner_id,
+    assigneeId: task.assignee_id ?? undefined,
+    assignerId: task.assigner_id ?? undefined,
     commentCount: task.comment_count,
   };
 }
@@ -29,6 +29,7 @@ export async function fetchAndFormatTasksFromApi(
 ) {
   const tasks = await authenticatedFetch<TodoistTask[]>(`/tasks`);
   const sortedTasks = sort ? sort(tasks) : tasks;
+  console.log({ task: sortedTasks[0] });
   const rows: Table = sortedTasks.reduce((acc, task, index) => {
     const formattedTask = formatTask(task);
     acc[formattedTask.id] = formattedTask as Row;

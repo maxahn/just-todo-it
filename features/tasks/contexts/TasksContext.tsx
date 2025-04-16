@@ -1,13 +1,14 @@
 import { syncTasksFromApi } from "@/store/util/syncTasksFromApi";
-import { Session, TaskUpdate } from "../types";
+import { Session, TaskExtraUpdate, TaskUpdate } from "../types";
 import { createContext, ProviderProps, useEffect, useState } from "react";
 import { useStore, useValue } from "tinybase/ui-react";
-import { TASK_TABLE_ID } from "@/store";
+import { TASK_EXTRA_TABLE_ID, TASK_TABLE_ID } from "@/store";
 
 export interface TasksContextState {
   activeTaskId: string;
   setActiveTaskId: (id: string) => void;
   updateTask: (id: string, update: TaskUpdate) => void;
+  updateTaskExtra: (id: string, update: TaskExtraUpdate) => void;
   clearSessions: () => void;
   getIsActive: () => boolean;
   sessions: Session[];
@@ -22,6 +23,7 @@ export const TasksContext = createContext<TasksContextState>({
   activeTaskId: "",
   setActiveTaskId: () => {},
   updateTask: () => {},
+  updateTaskExtra: () => {},
   clearSessions: () => {},
   getIsActive: () => false,
   sessions: [],
@@ -56,6 +58,10 @@ export function TasksProvider(
     store?.setPartialRow(TASK_TABLE_ID, id, update);
   };
 
+  const updateTaskExtra = (id: string, update: TaskExtraUpdate) => {
+    store?.setPartialRow(TASK_EXTRA_TABLE_ID, id, update);
+  };
+
   useEffect(() => {
     handleFetchAndSyncTasks();
   }, [store]);
@@ -67,6 +73,7 @@ export function TasksProvider(
         activeTaskId: activeTaskId as string,
         setActiveTaskId,
         updateTask,
+        updateTaskExtra,
         clearSessions: () => {},
         getIsActive: () => false,
         sessions: [],
