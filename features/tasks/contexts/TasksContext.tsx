@@ -1,18 +1,23 @@
 import { syncTasksFromApi } from "@/store/util/syncTasksFromApi";
 import { Session, TaskExtraUpdate, TaskUpdate } from "../types";
 import { createContext, ProviderProps, useEffect, useState } from "react";
-import { useStore, useValue } from "tinybase/ui-react";
-import { TASK_EXTRA_TABLE_ID, TASK_TABLE_ID } from "@/store";
+import { useStore, useTable, useValue } from "tinybase/ui-react";
+import { SESSION_TABLE_ID, TASK_EXTRA_TABLE_ID, TASK_TABLE_ID } from "@/store";
 
 export interface TasksContextState {
   activeTaskId: string;
+  activeSessionId: string;
+  isTimerPaused: boolean;
   setActiveTaskId: (id: string) => void;
+  setActiveSessionId: (id: string) => void;
+  setIsTimerPaused: (paused: boolean) => void;
   updateTask: (id: string, update: TaskUpdate) => void;
   updateTaskExtra: (id: string, update: TaskExtraUpdate) => void;
-  clearSessions: () => void;
+  startSession: (taskId: string) => void;
+  cancelSession: () => void;
+  finishSession: () => void;
   getIsActive: () => boolean;
-  sessions: Session[];
-  toggleIsTaskPaused: () => void;
+  toggleIsTaskPaused: (taskId: string) => void;
   getTotalSessionsDuration: () => number;
   removeSession: (index: number) => void;
   handleFetchAndSyncTasks: () => Promise<void>;
@@ -21,12 +26,17 @@ export interface TasksContextState {
 
 export const TasksContext = createContext<TasksContextState>({
   activeTaskId: "",
+  activeSessionId: "",
+  isTimerPaused: false,
   setActiveTaskId: () => {},
+  setActiveSessionId: () => {},
+  setIsTimerPaused: () => {},
   updateTask: () => {},
   updateTaskExtra: () => {},
-  clearSessions: () => {},
+  startSession: () => {},
+  cancelSession: () => {},
+  finishSession: () => {},
   getIsActive: () => false,
-  sessions: [],
   toggleIsTaskPaused: () => {},
   getTotalSessionsDuration: () => 0,
   removeSession: () => {},
@@ -39,7 +49,9 @@ export function TasksProvider(
 ) {
   const [isSyncing, setIsSyncing] = useState(false);
   const store = useStore();
-  const activeTaskId = useValue("activeTaskId");
+  const activeTaskId = useValue("activeTaskId") as string;
+  const isTimerPaused = useValue("isTimerPaused") as boolean;
+  const activeSessionId = useValue("activeSessionId") as string;
   // const tasksTable = useTable(TASK_TABLE_ID)
 
   const handleFetchAndSyncTasks = async () => {
@@ -54,12 +66,60 @@ export function TasksProvider(
     store?.setValue("activeTaskId", id);
   };
 
+  const setActiveSessionId = (id: string) => {
+    store?.setValue("activeSessionId", id);
+  };
+
+  const setIsTimerPaused = (paused: boolean) => {
+    store?.setValue("isTimerPaused", paused);
+  };
+
   const updateTask = (id: string, update: TaskUpdate) => {
     store?.setPartialRow(TASK_TABLE_ID, id, update);
   };
 
   const updateTaskExtra = (id: string, update: TaskExtraUpdate) => {
     store?.setPartialRow(TASK_EXTRA_TABLE_ID, id, update);
+  };
+
+  const startSession = (taskId: string) => {
+    console.log({ store });
+    const sessionId = store?.addRow(SESSION_TABLE_ID, {
+      taskId,
+      start: new Date().toISOString(),
+    });
+    if (!sessionId) throw new Error("Failed to start session");
+    store?.setValue("activeSessionId", sessionId);
+    return sessionId;
+  };
+  const finishSession = () => {
+    if (!activeSessionId) throw new Error("No active session");
+    return store?.setPartialRow(SESSION_TABLE_ID, activeSessionId, {
+      end: new Date().toISOString(),
+    });
+  };
+
+  const cancelSession = () => {
+    if (!activeSessionId) throw new Error("No active session");
+    setActiveSessionId("");
+    return store?.delRow(SESSION_TABLE_ID, activeSessionId);
+  };
+
+  const toggleIsTaskPaused = (taskId: string) => {
+    const isTimerPaused = store?.getValue("isTimerPaused");
+    if (isTimerPaused) {
+      const sessionId = startSession(taskId);
+      if (!sessionId) throw new Error("Failed to start session");
+      store?.setValue("isTimerPaused", false);
+      store?.setValue("activeSessionId", sessionId);
+      return;
+    }
+    const activeSessionId = store?.getValue("activeSessionId") as string;
+    if (!activeSessionId) throw new Error("No active session");
+    store?.setPartialRow(SESSION_TABLE_ID, activeSessionId, {
+      end: new Date().toISOString(),
+    });
+    store?.setValue("isTimerPaused", true);
   };
 
   useEffect(() => {
@@ -70,14 +130,19 @@ export function TasksProvider(
     <TasksContext.Provider
       value={{
         isSyncing,
-        activeTaskId: activeTaskId as string,
+        activeTaskId,
+        activeSessionId,
+        isTimerPaused,
+        setActiveSessionId,
+        setIsTimerPaused,
         setActiveTaskId,
         updateTask,
         updateTaskExtra,
-        clearSessions: () => {},
+        startSession,
+        cancelSession,
+        finishSession,
         getIsActive: () => false,
-        sessions: [],
-        toggleIsTaskPaused: () => {},
+        toggleIsTaskPaused,
         getTotalSessionsDuration: () => 0,
         removeSession: () => {},
         handleFetchAndSyncTasks,

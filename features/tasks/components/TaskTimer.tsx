@@ -25,63 +25,88 @@ import { parseISO } from "date-fns";
 import Animated, { LinearTransition } from "react-native-reanimated";
 import { useCompleteTaskMutation } from "../hooks/useCompleteTaskMutation";
 import useAppState from "@/hooks/useAppStateChange";
+import { TASK_EXTRA_TABLE_ID, TASK_TABLE_ID } from "@/store";
+import { useResultSortedRowIds, useRow } from "tinybase/ui-react";
+import { Task, TaskExtra } from "../types";
+import { QUERY_ID } from "@/store/queries";
+import { useActiveTaskSessionsTable } from "@/store/hooks/queries/useActiveSessionsQuery";
+import { sumSessionsDurationTable } from "../utils/sumSessionsDurationMs";
+import { Redirect } from "expo-router";
 
 const DEFAULT_ESTIMATE_SECONDS = 25 * 60;
-function getEstimateSeconds(
-  duration: { amount: number; unit: string } | undefined | null,
-) {
-  return duration?.amount ? duration.amount * 60 : DEFAULT_ESTIMATE_SECONDS;
+function getEstimateSeconds(duration: number | undefined) {
+  return duration ? duration * 60 : DEFAULT_ESTIMATE_SECONDS;
 }
 
-export default function TaskTimer() {
+interface TaskTimerProps {
+  id: string;
+}
+
+export default function TaskTimer({ id }: TaskTimerProps) {
+  const task = useRow(TASK_TABLE_ID, id) as Task;
+  const taskExtra = useRow(TASK_EXTRA_TABLE_ID, id) as TaskExtra;
+  const sessions = useResultSortedRowIds(
+    QUERY_ID.activeTaskSessions,
+    "start",
+    false,
+  );
+  const sessionsTable = useActiveTaskSessionsTable(id);
+
   const [sessionsVisible, setSessionsVisible] = useState(false);
   const [offset, setOffset] = useState(0);
   const { mutateAsync: completeTask, isPending: isCompleting } =
     useCompleteTaskMutation();
   const {
-    activeMission,
-    setActiveMission,
-    sessions,
-    getIsActive,
+    isTimerPaused,
+    setActiveTaskId,
     toggleIsTaskPaused,
-    getTotalSessionsDuration,
+    activeSessionId,
     removeSession,
-    clearSessions,
+    cancelSession,
+    updateTask,
+    finishSession,
   } = useActiveMission();
   const appState = useAppState();
-  const estimatedSeconds = getEstimateSeconds(activeMission?.duration);
+  const estimatedSeconds = getEstimateSeconds(taskExtra?.estimatedDuration);
 
   const handleCompleteTask = async () => {
     try {
-      if (!activeMission?.id) throw new Error("No active mission");
-      await completeTask({ id: activeMission.id });
-      setActiveMission(null);
+      if (!id) throw new Error("No active task");
+      await completeTask({ id });
+      await updateTask(id, { isCompleted: true });
+      finishSession();
+      setActiveTaskId("");
     } catch (error) {
       console.log({ error });
     }
   };
 
+  const handleCancelSession = () => {
+    cancelSession();
+  };
+
   useEffect(() => {
-    if (appState === "active" && activeMission) {
-      const totalSessionsDuration = getTotalSessionsDuration();
+    if (appState === "active" && id) {
+      const totalSessionsDuration = sumSessionsDurationTable(sessionsTable); // getTotalSessionsDuration();
       setOffset(-totalSessionsDuration);
     }
-  }, [appState]);
+  }, [appState, sessionsTable]);
 
-  const isPaused = !getIsActive();
+  if (!activeSessionId) return <Redirect href="/tabs/(tabs)/current-task" />;
+
   return (
     <VStack className="flex items-center gap-6 py-5">
       <VStack className="flex gap-3 items-center">
-        <Heading size="xl">Current Task</Heading>
+        <Heading size="xl">{task?.content}</Heading>
         <Heading size="lg" className="text-primary-300">
-          {activeMission?.content}
+          {task?.description}
         </Heading>
       </VStack>
       <Stopwatch
         offset={offset}
         estimatedSeconds={estimatedSeconds}
-        isPaused={isPaused}
-        onToggleIsPaused={toggleIsTaskPaused}
+        isPaused={isTimerPaused}
+        onToggleIsPaused={() => toggleIsTaskPaused(id)}
         hideControls
       />
 
@@ -90,11 +115,11 @@ export default function TaskTimer() {
           size="lg"
           action="negative"
           className="rounded-full w-16 h-16"
-          onPress={toggleIsTaskPaused}
+          onPress={() => toggleIsTaskPaused(id)}
         >
           <ButtonIcon
             className="w-7 h-7"
-            as={isPaused ? PlayIcon : PauseIcon}
+            as={isTimerPaused ? PlayIcon : PauseIcon}
           />
         </Button>
 
@@ -171,7 +196,11 @@ export default function TaskTimer() {
             }}
           />
         ) : null}
-        <Button variant="outline" action="negative" onPress={clearSessions}>
+        <Button
+          variant="outline"
+          action="negative"
+          onPress={handleCancelSession}
+        >
           <ButtonText>Cancel Session</ButtonText>
         </Button>
       </VStack>

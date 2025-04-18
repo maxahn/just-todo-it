@@ -17,7 +17,7 @@ export const useCompleteTaskMutation = (
   options?: MutationOptions<TaskMutationArgs, Error, TaskMutationArgs>,
 ) => {
   const queryClient = useQueryClient();
-  const { sessions, clearSessions } = useActiveMission();
+  const { sessions, cancelSession: clearSessions } = useActiveMission();
 
   return useMutation({
     mutationKey: ["complete-task"],

@@ -14,8 +14,6 @@ export default function Home() {
     false,
   );
 
-  // const sortedTaskIds = useSortedRowIds(TASK_TABLE_ID, "order", false);
-  console.log({ sortedTaskIds });
   const { setActiveTaskId, isSyncing, handleFetchAndSyncTasks } =
     useActiveMission();
   const router = useRouter();

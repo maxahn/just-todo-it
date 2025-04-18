@@ -9,6 +9,8 @@ export const store = createMergeableStore(SESSION_TABLE_ID);
 
 store.setValuesSchema({
   activeTaskId: { type: "string", default: "" },
+  activeSessionId: { type: "string", default: "" }, // !!!!
+  isTimerPaused: { type: "boolean", default: false }, // should timer be paused
 });
 
 store.setTablesSchema({

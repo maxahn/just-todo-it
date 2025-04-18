@@ -25,15 +25,6 @@ function getIsActive(sessions: Session[]) {
   return lastSession && lastSession[1] === null;
 }
 
-function sumSessionsDurationMS(sessions: Session[]): number {
-  return sessions.reduce((acc, [start, end]) => {
-    const workingEnd = end || new Date().toISOString();
-    const msDuration =
-      parseISO(workingEnd).getTime() - parseISO(start).getTime();
-    return acc + msDuration;
-  }, 0);
-}
-
 // export const ActiveMissionContext = createContext<ActiveMissionState>({
 //   activeMission: null,
 //   setActiveMission: () => {},

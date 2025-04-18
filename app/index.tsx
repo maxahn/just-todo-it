@@ -21,5 +21,5 @@ export default function Home() {
     return <Redirect href="./authenticate" />;
   }
 
-  return <Redirect href="/tabs/(tabs)" />;
+  return <Redirect href="/tabs/(tabs)/current-task" />;
 }

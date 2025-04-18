@@ -3,12 +3,12 @@ import { useSortedRowIds } from "tinybase/ui-react";
 import { MissionTask } from "@/features/tasks/components/MissionTask";
 import { Text } from "@/components/ui/text";
 import { useActiveMission } from "@/features/tasks/hooks/useActiveMission";
-import TaskTimer from "@/features/tasks/components/TaskTimer";
 import { Switch } from "@/components/ui/switch";
 import { HStack } from "@/components/ui/hstack";
 import { ScreenWrapper } from "@/components/ui/wrapper/ScreenWrapper";
 import { VStack } from "@/components/ui/vstack";
 import { TASK_TABLE_ID } from "@/store";
+import { Redirect } from "expo-router";
 
 export default function Home() {
   const [deferOffset, setDeferOffset] = useState(0);
@@ -18,13 +18,12 @@ export default function Home() {
     isSyncing,
     handleFetchAndSyncTasks,
     activeTaskId,
-    sessions,
+    activeSessionId,
     setActiveTaskId,
-    toggleIsTaskPaused,
   } = useActiveMission();
 
   function initializeActiveMission() {
-    if (!sortedTaskIds?.length || (activeTaskId && sessions.length)) {
+    if (!sortedTaskIds?.length || (activeTaskId && activeSessionId)) {
       return;
     }
     const nextActiveTaskId = sortedTaskIds[0 + deferOffset];
@@ -47,6 +46,11 @@ export default function Home() {
     initializeActiveMission();
   };
 
+  if (activeTaskId && activeSessionId) {
+    console.log("redirecting to timer");
+    return <Redirect href="./current-task/timer" />;
+  }
+
   return (
     <ScreenWrapper
       refreshControlProps={{
@@ -55,17 +59,7 @@ export default function Home() {
       }}
     >
       <VStack className="flex flex-1 justify-center">
-        {sessions?.length ? (
-          <TaskTimer />
-        ) : activeTaskId ? (
-          <MissionTask
-            id={activeTaskId}
-            onStart={toggleIsTaskPaused}
-            onDefer={handleDefer}
-          />
-        ) : (
-          <Text>No Active Task</Text>
-        )}
+        <MissionTask id={activeTaskId} onDefer={handleDefer} />
       </VStack>
       <HStack className="flex-0 align-center gap-2 justify-end items-center py-3">
         <Text className="font-semibold">Today Only</Text>

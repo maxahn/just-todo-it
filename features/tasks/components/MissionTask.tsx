@@ -18,11 +18,10 @@ import type { Task, TaskExtra } from "../types";
 
 type MissionTaskProps = {
   id: string;
-  onStart: () => void;
   onDefer: () => void;
 };
 
-export function MissionTask({ id, onStart, onDefer }: MissionTaskProps) {
+export function MissionTask({ id, onDefer }: MissionTaskProps) {
   const task = useRow(TASK_TABLE_ID, id) as Task;
   const taskExtra = useRow(TASK_EXTRA_TABLE_ID, id) as TaskExtra;
   const { content, description } = task;
@@ -32,7 +31,8 @@ export function MissionTask({ id, onStart, onDefer }: MissionTaskProps) {
     : false;
 
   const { mutateAsync: completeTask, isPending } = useCompleteTaskMutation();
-  const { setActiveTaskId, updateTask, updateTaskExtra } = useActiveMission();
+  const { setActiveTaskId, updateTask, updateTaskExtra, startSession } =
+    useActiveMission();
 
   const handleCompleteTask = async () => {
     try {
@@ -47,7 +47,7 @@ export function MissionTask({ id, onStart, onDefer }: MissionTaskProps) {
     }
   };
 
-  async function handleIncrementDuration(amount: number) {
+  const handleIncrementDuration = async (amount: number) => {
     try {
       if (!taskExtra) return;
       const updatedDuration = (taskExtra.estimatedDuration || 25) + amount;
@@ -57,7 +57,15 @@ export function MissionTask({ id, onStart, onDefer }: MissionTaskProps) {
     } catch (error) {
       console.log({ error });
     }
-  }
+  };
+
+  const handleStartTask = async () => {
+    try {
+      await Promise.all([setActiveTaskId(id), startSession(id)]);
+    } catch (error) {
+      console.log({ error });
+    }
+  };
 
   return (
     <Card className="rounded-xl p-6 gap-4" variant="filled">
@@ -117,7 +125,7 @@ export function MissionTask({ id, onStart, onDefer }: MissionTaskProps) {
         </HStack>
       </HStack>
       <HStack className="flex gap-2">
-        <Button size="xl" className="flex-1" onPress={onStart}>
+        <Button size="xl" className="flex-1" onPress={handleStartTask}>
           <ButtonText>Start Task</ButtonText>
         </Button>
         <Button size="xl" action="secondary" onPress={onDefer}>

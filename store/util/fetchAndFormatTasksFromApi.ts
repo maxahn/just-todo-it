@@ -29,7 +29,6 @@ export async function fetchAndFormatTasksFromApi(
 ) {
   const tasks = await authenticatedFetch<TodoistTask[]>(`/tasks`);
   const sortedTasks = sort ? sort(tasks) : tasks;
-  console.log({ task: sortedTasks[0] });
   const rows: Table = sortedTasks.reduce((acc, task, index) => {
     const formattedTask = formatTask(task);
     acc[formattedTask.id] = formattedTask as Row;

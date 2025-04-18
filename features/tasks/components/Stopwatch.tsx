@@ -36,6 +36,7 @@ export default function Stopwatch({
   // On Android, timer pauses when app goes to background
   // So this re-syncs when app is active again
   useEffect(() => {
+    console.log({ estimatedSeconds, offset });
     setSecondsRemaining(estimatedSeconds + offset);
   }, [estimatedSeconds, offset]);
 
