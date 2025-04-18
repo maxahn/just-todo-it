@@ -3,12 +3,7 @@ import { Text } from "@/components/ui/text";
 import { useTasksAndSessions } from "../hooks/useActiveMission";
 import Stopwatch from "./Stopwatch";
 import { HStack } from "@/components/ui/hstack";
-import {
-  Button,
-  ButtonIcon,
-  ButtonSpinner,
-  ButtonText,
-} from "@/components/ui/button";
+import { Button, ButtonIcon, ButtonText } from "@/components/ui/button";
 import { VStack } from "@/components/ui/vstack";
 import { useEffect, useState } from "react";
 import { Heading } from "@/components/ui/heading";
@@ -55,7 +50,6 @@ export default function TaskTimer({ id }: TaskTimerProps) {
   const [offset, setOffset] = useState(0);
   const {
     isTimerPaused,
-    isCompleting,
     completeTask,
     toggleIsTaskPaused,
     activeSessionId,
@@ -86,8 +80,6 @@ export default function TaskTimer({ id }: TaskTimerProps) {
     }
   }, [appState, sessionsTable]);
 
-  console.log("--------------------------------");
-  console.log({ activeSessionId, activeTaskId });
   if (!activeSessionId || !activeTaskId)
     return <Redirect href="/tabs/(tabs)/current-task" />;
 

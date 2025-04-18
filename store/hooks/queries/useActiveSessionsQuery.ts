@@ -6,7 +6,6 @@ import {
   useResultSortedRowIds,
   useResultTable,
   useRow,
-  useTable,
 } from "tinybase/ui-react";
 
 export function useActiveSessionsQuery(taskId: string) {
@@ -32,9 +31,7 @@ export function useActiveSessionsQuery(taskId: string) {
 
 export function useActiveTaskSessionsTable(taskId: string) {
   const activeTaskSessionsQueryId = useActiveSessionsQuery(taskId);
-  console.log({ activeTaskSessionsQueryId });
   const activeTaskSessions = useResultTable(activeTaskSessionsQueryId);
-  console.log({ activeTaskSessions });
   return activeTaskSessions;
 }
 
