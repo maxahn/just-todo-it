@@ -1,7 +1,7 @@
 import { FlatList, RefreshControl } from "react-native";
 import { Center } from "@/components/ui/center";
 import { Box } from "@/components/ui/box";
-import { useActiveMission } from "@/features/tasks/hooks/useActiveMission";
+import { useTasksAndSessions } from "@/features/tasks/hooks/useActiveMission";
 import { useRouter } from "expo-router";
 import { TaskCard } from "@/features/tasks/components/TaskCard";
 import { useSortedIncompleteTasks } from "@/store/hooks/queries/useTasks";
@@ -10,7 +10,7 @@ export default function Home() {
   const sortedTaskIds = useSortedIncompleteTasks();
 
   const { setActiveTaskId, isSyncing, handleFetchAndSyncTasks } =
-    useActiveMission();
+    useTasksAndSessions();
   const router = useRouter();
 
   const handleSetActiveTask = (id: string) => {

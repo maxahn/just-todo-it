@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 import { MissionTask } from "@/features/tasks/components/MissionTask";
 import { Text } from "@/components/ui/text";
-import { useActiveMission } from "@/features/tasks/hooks/useActiveMission";
+import { useTasksAndSessions } from "@/features/tasks/hooks/useActiveMission";
 import { Switch } from "@/components/ui/switch";
 import { HStack } from "@/components/ui/hstack";
 import { ScreenWrapper } from "@/components/ui/wrapper/ScreenWrapper";
@@ -19,7 +19,7 @@ export default function Home() {
     activeTaskId,
     activeSessionId,
     setActiveTaskId,
-  } = useActiveMission();
+  } = useTasksAndSessions();
 
   function initializeActiveMission() {
     if (!sortedIncompleteTaskIds?.length || (activeTaskId && activeSessionId)) {

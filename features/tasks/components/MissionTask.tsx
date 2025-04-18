@@ -10,7 +10,7 @@ import { Text } from "@/components/ui/text";
 import { isToday } from "date-fns";
 import { isAfter } from "date-fns/isAfter";
 import { CheckIcon } from "lucide-react-native";
-import { useActiveMission } from "../hooks/useActiveMission";
+import { useTasksAndSessions } from "../hooks/useActiveMission";
 import { useRow } from "tinybase/ui-react";
 import { TASK_EXTRA_TABLE_ID, TASK_TABLE_ID } from "@/store";
 import type { Task, TaskExtra } from "../types";
@@ -35,7 +35,7 @@ export function MissionTask({ id, onDefer }: MissionTaskProps) {
     setActiveTaskId,
     startSession,
     updateTaskExtra,
-  } = useActiveMission();
+  } = useTasksAndSessions();
 
   const handleCompleteTask = async () => {
     try {

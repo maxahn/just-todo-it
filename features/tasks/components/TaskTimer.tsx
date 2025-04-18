@@ -1,6 +1,6 @@
 import { Card } from "@/components/ui/card";
 import { Text } from "@/components/ui/text";
-import { useActiveMission } from "../hooks/useActiveMission";
+import { useTasksAndSessions } from "../hooks/useActiveMission";
 import Stopwatch from "./Stopwatch";
 import { HStack } from "@/components/ui/hstack";
 import {
@@ -62,7 +62,7 @@ export default function TaskTimer({ id }: TaskTimerProps) {
     removeSession,
     cancelSession,
     activeTaskId,
-  } = useActiveMission();
+  } = useTasksAndSessions();
   const appState = useAppState();
   const estimatedSeconds = getEstimateSeconds(taskExtra?.estimatedDuration);
 
