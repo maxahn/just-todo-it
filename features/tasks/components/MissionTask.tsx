@@ -10,7 +10,6 @@ import { Text } from "@/components/ui/text";
 import { isToday } from "date-fns";
 import { isAfter } from "date-fns/isAfter";
 import { CheckIcon } from "lucide-react-native";
-import { useCompleteTaskMutation } from "../hooks/useCompleteTaskMutation";
 import { useActiveMission } from "../hooks/useActiveMission";
 import { useRow } from "tinybase/ui-react";
 import { TASK_EXTRA_TABLE_ID, TASK_TABLE_ID } from "@/store";
@@ -30,18 +29,18 @@ export function MissionTask({ id, onDefer }: MissionTaskProps) {
     ? isAfter(dueDate, new Date().setHours(0, 0, 0, 0)) || !isToday(dueDate)
     : false;
 
-  const { mutateAsync: completeTask, isPending } = useCompleteTaskMutation();
-  const { setActiveTaskId, updateTask, updateTaskExtra, startSession } =
-    useActiveMission();
+  const {
+    isCompleting,
+    completeTask,
+    setActiveTaskId,
+    startSession,
+    updateTaskExtra,
+  } = useActiveMission();
 
   const handleCompleteTask = async () => {
     try {
-      await completeTask({ id });
-      // TODO: sync local tasks to todoist
-      await updateTask(id, {
-        isCompleted: true,
-      });
-      setActiveTaskId("");
+      if (!id) throw new Error("No active task");
+      await completeTask(id);
     } catch (error) {
       console.log({ error });
     }
@@ -76,7 +75,7 @@ export function MissionTask({ id, onDefer }: MissionTaskProps) {
           variant="outline"
           size="sm"
           className="rounded-full h-8 w-8"
-          isDisabled={isPending}
+          isDisabled={isCompleting}
           onPress={handleCompleteTask}
         >
           <ButtonIcon as={CheckIcon} />

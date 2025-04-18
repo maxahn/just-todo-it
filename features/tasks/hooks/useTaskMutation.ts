@@ -10,19 +10,22 @@ type TaskMutationArgs = {
   id: string;
   taskChange: Partial<TaskUpdate>;
 };
+
+type TaskMutationResult = Task | undefined;
+
 export const useTaskMutation = (
-  options?: MutationOptions<Task, Error, TaskMutationArgs>,
+  options?: MutationOptions<TaskMutationResult, Error, TaskMutationArgs>,
 ) => {
   const queryClient = useQueryClient();
   return useMutation({
     mutationKey: ["task"],
-    mutationFn: async ({ id, taskChange }: TaskMutationArgs): Promise<Task> => {
-      return await authenticatedPost<Task>(
-        `https://api.todoist.com/rest/v2/tasks/${id}`,
-        {
-          body: JSON.stringify(taskChange),
-        },
-      );
+    mutationFn: async ({
+      id,
+      taskChange,
+    }: TaskMutationArgs): Promise<TaskMutationResult> => {
+      return await authenticatedPost<Task>(`/tasks/${id}`, {
+        body: JSON.stringify(taskChange),
+      });
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["tasks"] });

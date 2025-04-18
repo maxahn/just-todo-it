@@ -27,7 +27,7 @@ function formatTask(task: TodoistTask): Task {
 export async function fetchAndFormatTasksFromApi(
   sort?: (tasks: TodoistTask[]) => TodoistTask[],
 ) {
-  const tasks = await authenticatedFetch<TodoistTask[]>(`/tasks`);
+  const tasks = (await authenticatedFetch<TodoistTask[]>(`/tasks`)) ?? [];
   const sortedTasks = sort ? sort(tasks) : tasks;
   const rows: Table = sortedTasks.reduce((acc, task, index) => {
     const formattedTask = formatTask(task);

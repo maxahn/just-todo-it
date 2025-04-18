@@ -4,15 +4,10 @@ import { Box } from "@/components/ui/box";
 import { useActiveMission } from "@/features/tasks/hooks/useActiveMission";
 import { useRouter } from "expo-router";
 import { TaskCard } from "@/features/tasks/components/TaskCard";
-import { useResultSortedRowIds } from "tinybase/ui-react";
-import { QUERY_ID } from "@/store/queries";
+import { useSortedIncompleteTasks } from "@/store/hooks/queries/useTasks";
 
 export default function Home() {
-  const sortedTaskIds = useResultSortedRowIds(
-    QUERY_ID.incompleteTasks,
-    "order",
-    false,
-  );
+  const sortedTaskIds = useSortedIncompleteTasks();
 
   const { setActiveTaskId, isSyncing, handleFetchAndSyncTasks } =
     useActiveMission();

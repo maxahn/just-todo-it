@@ -1,5 +1,4 @@
 import { useEffect, useState } from "react";
-import { useSortedRowIds } from "tinybase/ui-react";
 import { MissionTask } from "@/features/tasks/components/MissionTask";
 import { Text } from "@/components/ui/text";
 import { useActiveMission } from "@/features/tasks/hooks/useActiveMission";
@@ -7,13 +6,13 @@ import { Switch } from "@/components/ui/switch";
 import { HStack } from "@/components/ui/hstack";
 import { ScreenWrapper } from "@/components/ui/wrapper/ScreenWrapper";
 import { VStack } from "@/components/ui/vstack";
-import { TASK_TABLE_ID } from "@/store";
 import { Redirect } from "expo-router";
+import { useSortedIncompleteTasks } from "@/store/hooks/queries/useTasks";
 
 export default function Home() {
   const [deferOffset, setDeferOffset] = useState(0);
   const [todayOnly, setTodayOnly] = useState(true);
-  const sortedTaskIds = useSortedRowIds(TASK_TABLE_ID, "order", false);
+  const sortedIncompleteTaskIds = useSortedIncompleteTasks();
   const {
     isSyncing,
     handleFetchAndSyncTasks,
@@ -23,10 +22,10 @@ export default function Home() {
   } = useActiveMission();
 
   function initializeActiveMission() {
-    if (!sortedTaskIds?.length || (activeTaskId && activeSessionId)) {
+    if (!sortedIncompleteTaskIds?.length || (activeTaskId && activeSessionId)) {
       return;
     }
-    const nextActiveTaskId = sortedTaskIds[0 + deferOffset];
+    const nextActiveTaskId = sortedIncompleteTaskIds[0 + deferOffset];
     setActiveTaskId(nextActiveTaskId);
   }
 
@@ -37,9 +36,9 @@ export default function Home() {
   }
 
   useEffect(() => {
-    if (activeTaskId) return;
+    if (activeTaskId && sortedIncompleteTaskIds.includes(activeTaskId)) return;
     initializeActiveMission();
-  }, [sortedTaskIds, todayOnly, activeTaskId]);
+  }, [sortedIncompleteTaskIds, todayOnly, activeTaskId]);
 
   const handleRefetchTasks = async () => {
     await handleFetchAndSyncTasks;

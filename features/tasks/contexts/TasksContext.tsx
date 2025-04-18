@@ -1,8 +1,9 @@
 import { syncTasksFromApi } from "@/store/util/syncTasksFromApi";
-import { Session, TaskExtraUpdate, TaskUpdate } from "../types";
 import { createContext, ProviderProps, useEffect, useState } from "react";
-import { useStore, useTable, useValue } from "tinybase/ui-react";
+import { useStore, useValue } from "tinybase/ui-react";
 import { SESSION_TABLE_ID, TASK_EXTRA_TABLE_ID, TASK_TABLE_ID } from "@/store";
+import { useCompleteTaskMutation } from "../hooks/useCompleteTaskMutation";
+import type { TaskExtraUpdate, TaskUpdate } from "../types";
 
 export interface TasksContextState {
   activeTaskId: string;
@@ -13,6 +14,7 @@ export interface TasksContextState {
   setIsTimerPaused: (paused: boolean) => void;
   updateTask: (id: string, update: TaskUpdate) => void;
   updateTaskExtra: (id: string, update: TaskExtraUpdate) => void;
+  completeTask: (id: string) => Promise<void>;
   startSession: (taskId: string) => void;
   cancelSession: () => void;
   finishSession: () => void;
@@ -22,6 +24,7 @@ export interface TasksContextState {
   removeSession: (index: number) => void;
   handleFetchAndSyncTasks: () => Promise<void>;
   isSyncing: boolean;
+  isCompleting: boolean;
 }
 
 export const TasksContext = createContext<TasksContextState>({
@@ -34,6 +37,7 @@ export const TasksContext = createContext<TasksContextState>({
   updateTask: () => {},
   updateTaskExtra: () => {},
   startSession: () => {},
+  completeTask: async () => {},
   cancelSession: () => {},
   finishSession: () => {},
   getIsActive: () => false,
@@ -42,6 +46,7 @@ export const TasksContext = createContext<TasksContextState>({
   removeSession: () => {},
   handleFetchAndSyncTasks: async () => {},
   isSyncing: false,
+  isCompleting: false,
 });
 
 export function TasksProvider(
@@ -52,6 +57,8 @@ export function TasksProvider(
   const activeTaskId = useValue("activeTaskId") as string;
   const isTimerPaused = useValue("isTimerPaused") as boolean;
   const activeSessionId = useValue("activeSessionId") as string;
+  const { mutateAsync: completeTaskAsync, isPending: isCompleting } =
+    useCompleteTaskMutation();
   // const tasksTable = useTable(TASK_TABLE_ID)
 
   const handleFetchAndSyncTasks = async () => {
@@ -83,7 +90,6 @@ export function TasksProvider(
   };
 
   const startSession = (taskId: string) => {
-    console.log({ store });
     const sessionId = store?.addRow(SESSION_TABLE_ID, {
       taskId,
       start: new Date().toISOString(),
@@ -92,11 +98,25 @@ export function TasksProvider(
     store?.setValue("activeSessionId", sessionId);
     return sessionId;
   };
+
   const finishSession = () => {
     if (!activeSessionId) throw new Error("No active session");
     return store?.setPartialRow(SESSION_TABLE_ID, activeSessionId, {
       end: new Date().toISOString(),
     });
+  };
+
+  const completeTask = async (id: string) => {
+    if (!id) throw new Error("No active task");
+    // TODO: refactor to sync local and remote data
+    const completeTaskPromise = completeTaskAsync({ id });
+    const updateTaskPromise = updateTask(id, { isCompleted: true });
+    if (activeSessionId) {
+      finishSession();
+    }
+    setActiveTaskId("");
+    setActiveSessionId("");
+    await Promise.all([completeTaskPromise, updateTaskPromise]);
   };
 
   const cancelSession = () => {
@@ -130,6 +150,7 @@ export function TasksProvider(
     <TasksContext.Provider
       value={{
         isSyncing,
+        isCompleting,
         activeTaskId,
         activeSessionId,
         isTimerPaused,
@@ -138,6 +159,7 @@ export function TasksProvider(
         setActiveTaskId,
         updateTask,
         updateTaskExtra,
+        completeTask,
         startSession,
         cancelSession,
         finishSession,

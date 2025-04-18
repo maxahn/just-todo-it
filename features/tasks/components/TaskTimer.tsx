@@ -23,7 +23,6 @@ import {
 import { formatSession, secondsToFormattedTime } from "../utils/formatTime";
 import { parseISO } from "date-fns";
 import Animated, { LinearTransition } from "react-native-reanimated";
-import { useCompleteTaskMutation } from "../hooks/useCompleteTaskMutation";
 import useAppState from "@/hooks/useAppStateChange";
 import { TASK_EXTRA_TABLE_ID, TASK_TABLE_ID } from "@/store";
 import { useResultSortedRowIds, useRow } from "tinybase/ui-react";
@@ -54,17 +53,15 @@ export default function TaskTimer({ id }: TaskTimerProps) {
 
   const [sessionsVisible, setSessionsVisible] = useState(false);
   const [offset, setOffset] = useState(0);
-  const { mutateAsync: completeTask, isPending: isCompleting } =
-    useCompleteTaskMutation();
   const {
     isTimerPaused,
-    setActiveTaskId,
+    isCompleting,
+    completeTask,
     toggleIsTaskPaused,
     activeSessionId,
     removeSession,
     cancelSession,
-    updateTask,
-    finishSession,
+    activeTaskId,
   } = useActiveMission();
   const appState = useAppState();
   const estimatedSeconds = getEstimateSeconds(taskExtra?.estimatedDuration);
@@ -72,10 +69,7 @@ export default function TaskTimer({ id }: TaskTimerProps) {
   const handleCompleteTask = async () => {
     try {
       if (!id) throw new Error("No active task");
-      await completeTask({ id });
-      await updateTask(id, { isCompleted: true });
-      finishSession();
-      setActiveTaskId("");
+      await completeTask(id);
     } catch (error) {
       console.log({ error });
     }
@@ -92,7 +86,10 @@ export default function TaskTimer({ id }: TaskTimerProps) {
     }
   }, [appState, sessionsTable]);
 
-  if (!activeSessionId) return <Redirect href="/tabs/(tabs)/current-task" />;
+  console.log("--------------------------------");
+  console.log({ activeSessionId, activeTaskId });
+  if (!activeSessionId || !activeTaskId)
+    return <Redirect href="/tabs/(tabs)/current-task" />;
 
   return (
     <VStack className="flex items-center gap-6 py-5">
@@ -128,13 +125,8 @@ export default function TaskTimer({ id }: TaskTimerProps) {
           action="positive"
           className="rounded-full w-16 h-16"
           onPress={handleCompleteTask}
-          isDisabled={isCompleting}
         >
-          {isCompleting ? (
-            <ButtonSpinner color="white" />
-          ) : (
-            <ButtonIcon className="w-7 h-7" as={CheckIcon} />
-          )}
+          <ButtonIcon className="w-7 h-7" as={CheckIcon} />
         </Button>
       </HStack>
 

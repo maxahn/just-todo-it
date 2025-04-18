@@ -9,10 +9,11 @@ export async function authenticatedPost<T>(
     path,
     {
       method: "POST",
+      ...init,
       headers: {
         "Content-Type": "application/json",
+        ...(init?.headers || {}),
       },
-      ...init,
     },
     token,
   );
