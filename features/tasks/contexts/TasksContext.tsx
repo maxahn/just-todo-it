@@ -145,8 +145,10 @@ export function TasksProvider(
     setActiveTaskId(taskId);
     const sessionId = startSession(taskId);
     const subSessionId = startSubSession(sessionId);
-    store?.setValue("activeSessionId", sessionId);
-    store?.setValue("activeSubSessionId", subSessionId);
+    console.log("setting....");
+    console.log({ sessionId, subSessionId });
+    setActiveSessionId(sessionId);
+    setActiveSubSessionId(subSessionId);
   };
 
   const completeTask = async (id: string) => {
@@ -186,6 +188,7 @@ export function TasksProvider(
     handleFetchAndSyncTasks();
   }, [store]);
 
+  console.log({ activeSessionId, activeSubSessionId });
   return (
     <TasksContext.Provider
       value={{
