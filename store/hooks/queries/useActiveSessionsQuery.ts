@@ -19,13 +19,14 @@ export function useActiveSessionsQuery(taskId: string) {
       queryId,
       SUB_SESSION_TABLE_ID,
       ({ select, where, join }) => {
-        join(SUB_SESSION_TABLE_ID, "sessionId");
-        select("taskId");
-        select("start");
-        select("end");
-        select("distractionCount");
-        select("taskCompleted");
-        where("taskId", taskId);
+        select(SUB_SESSION_TABLE_ID, "start");
+        select(SUB_SESSION_TABLE_ID, "end");
+        select(SUB_SESSION_TABLE_ID, "sessionId");
+        select(SUB_SESSION_TABLE_ID, "distractionCount");
+        select(SUB_SESSION_TABLE_ID, "taskCompleted");
+        select(SESSION_TABLE_ID, "taskId");
+        join(SESSION_TABLE_ID, "sessionId");
+        where(SESSION_TABLE_ID, "taskId", taskId);
       },
     );
     return queryId;

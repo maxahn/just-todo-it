@@ -112,7 +112,7 @@ export function TasksProvider(
       taskId,
     });
     if (!sessionId) throw new Error("Failed to start session");
-    store?.setValue("activeSessionId", sessionId);
+    setActiveSessionId(sessionId);
     startSubSession(sessionId);
     return sessionId;
   };
@@ -122,7 +122,7 @@ export function TasksProvider(
       start: new Date().toISOString(),
     });
     if (!subSessionId) throw new Error("Failed to start sub session");
-    store?.setValue("activeSubSessionId", subSessionId);
+    setActiveSubSessionId(subSessionId);
     return subSessionId;
   };
 
@@ -143,12 +143,7 @@ export function TasksProvider(
 
   const startTask = (taskId: string) => {
     setActiveTaskId(taskId);
-    const sessionId = startSession(taskId);
-    const subSessionId = startSubSession(sessionId);
-    console.log("setting....");
-    console.log({ sessionId, subSessionId });
-    setActiveSessionId(sessionId);
-    setActiveSubSessionId(subSessionId);
+    startSession(taskId);
   };
 
   const completeTask = async (id: string) => {

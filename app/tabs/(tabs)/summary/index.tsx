@@ -1,10 +1,6 @@
 import { Card } from "@/components/ui/card";
-// import { MenuSeparator } from "@/components/ui/menu";
 import { Text } from "@/components/ui/text";
-import {
-  ScreenWrapper,
-  ScrollViewScreenWrapper,
-} from "@/components/ui/wrapper/ScreenWrapper";
+import { ScreenWrapper } from "@/components/ui/wrapper/ScreenWrapper";
 import {
   SESSION_TABLE_ID,
   SUB_SESSION_TABLE_ID,
@@ -12,21 +8,15 @@ import {
   TASK_TABLE_ID,
 } from "@/store";
 import { Box } from "@/components/ui/box";
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
+import { FlatList, ScrollView, TouchableOpacity } from "react-native";
 import {
-  FlatList,
-  ScrollView,
-  StyleSheet,
-  TouchableOpacity,
-  View,
-} from "react-native";
-import {
-  CellView,
   useStore,
-  TableView,
-  useTable,
   useSortedRowIds,
   useRow,
+  useResultTable,
+  useResultSortedRowIds,
+  useResultRow,
 } from "tinybase/ui-react";
 import { HStack } from "@/components/ui/hstack";
 import { Button, ButtonText } from "@/components/ui/button";
@@ -37,6 +27,9 @@ export default function Summary() {
   const [activeTable, setActiveTable] = useState<string>(SESSION_TABLE_ID);
   const [activeTaskId, setActiveTaskId] = useState<string>("");
   const queryId = useActiveSessionsQuery(activeTaskId);
+  console.log("queryId", queryId);
+  const resultIds = useResultSortedRowIds(queryId);
+  console.log("resultTable", resultIds);
   const store = useStore();
 
   const handleItemPress = (id: string) => {
@@ -76,6 +69,7 @@ export default function Summary() {
 
   let sortField = undefined;
   let desc = false;
+  const isResultTable = activeTable === queryId;
   switch (activeTable) {
     case SUB_SESSION_TABLE_ID:
       sortField = "start";
@@ -88,6 +82,13 @@ export default function Summary() {
     default:
       break;
   }
+
+  useEffect(() => {
+    if (queryId) {
+      setActiveTable(queryId);
+    }
+  }, [queryId]);
+
   return (
     <ScreenWrapper>
       <HStack className="justify-between">
@@ -101,6 +102,7 @@ export default function Summary() {
         onItemPress={handleItemPress}
         sortField={sortField}
         desc={desc}
+        isResultTable={isResultTable}
       />
       <ScrollView horizontal>
         <HStack className="gap-2 flex-0">
@@ -145,22 +147,31 @@ function TableList({
   onItemPress,
   sortField,
   desc,
+  isResultTable = false,
   ...rest
 }: {
   tableId: string;
   onItemPress: (id: string) => void;
   sortField?: string;
   desc?: boolean;
+  isResultTable?: boolean;
 } & Partial<React.ComponentProps<typeof FlatList>>) {
   const sortedRowIds = useSortedRowIds(tableId, sortField, desc) as string[];
+  const sortedResultRowIds = useResultSortedRowIds(tableId, sortField, desc);
+  console.log({ sortedResultRowIds });
   return (
     <FlatList
       {...rest}
       style={{ width: "100%" }}
       ItemSeparatorComponent={() => <Box className="h-2" />}
-      data={sortedRowIds}
+      data={isResultTable ? sortedResultRowIds : sortedRowIds}
       renderItem={({ item }) => (
-        <RowCard tableId={tableId} rowId={item} onPressRow={onItemPress} />
+        <RowCard
+          tableId={tableId}
+          rowId={item as unknown as string}
+          onPressRow={onItemPress}
+          isResultTable={isResultTable}
+        />
       )}
     />
   );
@@ -170,20 +181,23 @@ function RowCard({
   tableId,
   rowId,
   onPressRow,
+  isResultTable,
   ...rest
 }: {
   tableId: string;
   rowId: string;
   onPressRow: (id: string) => void;
+  isResultTable?: boolean;
 } & React.ComponentProps<typeof Card>) {
   const row = useRow(tableId, rowId);
+  const resultRow = useResultRow(tableId, rowId);
   return (
     <Card className="flex flex-row flex-wrap p-1" {...rest}>
       <TouchableOpacity onPress={() => onPressRow(rowId)}>
         <Box className="p-1 border border-gray-200 pr-2">
           <Text>ID: {rowId}</Text>
         </Box>
-        {Object.entries(row).map(([key, value]) => (
+        {Object.entries(isResultTable ? resultRow : row).map(([key, value]) => (
           <Box key={key} className="p-1 border border-gray-200 pr-2">
             <Text>
               {key}: {value}
