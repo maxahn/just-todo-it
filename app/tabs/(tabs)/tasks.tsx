@@ -6,7 +6,7 @@ import { useRouter } from "expo-router";
 import { TaskCard } from "@/features/tasks/components/TaskCard";
 import { useSortedIncompleteTasks } from "@/store/hooks/queries/useTasks";
 
-export default function Home() {
+export default function TasksListScreen() {
   const sortedTaskIds = useSortedIncompleteTasks();
 
   const { setActiveTaskId, isSyncing, handleFetchAndSyncTasks } =

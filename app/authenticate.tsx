@@ -1,4 +1,4 @@
-import { ScreenWrapper } from "@/components/ui/wrapper/ScreenWrapper";
+import { ScrollViewScreenWrapper } from "@/components/ui/wrapper/ScreenWrapper";
 import { AuthTokenForm } from "@/features/authentication/components/AuthTokenForm";
 import { useRouter } from "expo-router";
 import { useState } from "react";
@@ -8,7 +8,7 @@ export default function Authenticate() {
   const [value, setValue] = useState("");
 
   return (
-    <ScreenWrapper>
+    <ScrollViewScreenWrapper>
       <AuthTokenForm
         value={value}
         onChangeText={setValue}
@@ -16,6 +16,6 @@ export default function Authenticate() {
           router.push("/");
         }}
       />
-    </ScreenWrapper>
+    </ScrollViewScreenWrapper>
   );
 }

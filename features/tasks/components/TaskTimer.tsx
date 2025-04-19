@@ -19,9 +19,13 @@ import { formatSession, secondsToFormattedTime } from "../utils/formatTime";
 import { parseISO } from "date-fns";
 import Animated, { LinearTransition } from "react-native-reanimated";
 import useAppState from "@/hooks/useAppStateChange";
-import { TASK_EXTRA_TABLE_ID, TASK_TABLE_ID } from "@/store";
+import {
+  SUB_SESSION_TABLE_ID,
+  TASK_EXTRA_TABLE_ID,
+  TASK_TABLE_ID,
+} from "@/store";
 import { useResultSortedRowIds, useRow } from "tinybase/ui-react";
-import { Task, TaskExtra } from "../types";
+import { SubSession, Task, TaskExtra } from "../types";
 import { QUERY_ID } from "@/store/queries";
 import { useActiveTaskSessionsTable } from "@/store/hooks/queries/useActiveSessionsQuery";
 import { sumSessionsDurationTable } from "../utils/sumSessionsDurationMs";
@@ -143,7 +147,11 @@ export default function TaskTimer({ id }: TaskTimerProps) {
             keyExtractor={(item) => item[0]}
             contentContainerStyle={{ gap: 8 }}
             renderItem={({ item, index }) => {
-              const [start, end] = item;
+              const subSession = useRow(
+                SUB_SESSION_TABLE_ID,
+                item,
+              ) as SubSession;
+              const { start, end } = subSession;
               return (
                 <Card>
                   <HStack className="flex justify-between items-center">
@@ -160,7 +168,7 @@ export default function TaskTimer({ id }: TaskTimerProps) {
                         </Text>
                       ) : null}
                       <Text size="xs" className="inline-block align-middle">
-                        {formatSession([start, end])}
+                        {formatSession([start, end || null])}
                       </Text>
                     </VStack>
                     <Button

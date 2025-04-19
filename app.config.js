@@ -75,6 +75,11 @@ switch (process.env.CHANNEL) {
     break;
 }
 
+const AdaptiveIcon = {
+  foregroundImage: "./assets/images/adaptive-icon.png",
+  backgroundColor: "#0F172A",
+};
+
 const config = {
   expo: {
     name: routes.appName,
@@ -91,12 +96,11 @@ const config = {
       config: {
         usesNonExemptEncryption: false,
       },
+      icon: "./assets/images/icon-with-background.png",
     },
     android: {
-      adaptiveIcon: {
-        foregroundImage: "./assets/images/adaptive-icon.png",
-        backgroundColor: "#0F172A",
-      },
+      adaptiveIcon: AdaptiveIcon,
+      random: "",
       package: routes.bundleIdentifier,
     },
     web: {
@@ -112,7 +116,7 @@ const config = {
           image: "./assets/images/icon.png",
           imageWidth: 256,
           resizeMode: "contain",
-          backgroundColor: "#ffffff",
+          backgroundColor: "#0F172A",
         },
       ],
       [

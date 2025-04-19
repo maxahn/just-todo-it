@@ -4,10 +4,13 @@ import { Text } from "@/components/ui/text";
 import { useTasksAndSessions } from "@/features/tasks/hooks/useActiveMission";
 import { Switch } from "@/components/ui/switch";
 import { HStack } from "@/components/ui/hstack";
-import { ScreenWrapper } from "@/components/ui/wrapper/ScreenWrapper";
+import { ScrollViewScreenWrapper } from "@/components/ui/wrapper/ScreenWrapper";
 import { VStack } from "@/components/ui/vstack";
 import { Redirect } from "expo-router";
 import { useSortedIncompleteTasks } from "@/store/hooks/queries/useTasks";
+import { SUB_SESSION_TABLE_ID } from "@/store";
+import { useRow } from "tinybase/ui-react";
+import _ from "lodash";
 
 export default function Home() {
   const [deferOffset, setDeferOffset] = useState(0);
@@ -18,8 +21,11 @@ export default function Home() {
     handleFetchAndSyncTasks,
     activeTaskId,
     activeSessionId,
+    activeSubSessionId,
     setActiveTaskId,
   } = useTasksAndSessions();
+  const activeSubSession = useRow(SUB_SESSION_TABLE_ID, activeSubSessionId);
+  console.log("activeSubSession", activeSubSession);
 
   function initializeActiveMission() {
     if (!sortedIncompleteTaskIds?.length || (activeTaskId && activeSessionId)) {
@@ -45,13 +51,13 @@ export default function Home() {
     initializeActiveMission();
   };
 
-  if (activeTaskId && activeSessionId) {
+  if (activeTaskId && !_.isEmpty(activeSubSession)) {
     console.log("redirecting to timer");
     return <Redirect href="./current-task/timer" />;
   }
 
   return (
-    <ScreenWrapper
+    <ScrollViewScreenWrapper
       refreshControlProps={{
         refreshing: isSyncing,
         onRefresh: handleRefetchTasks,
@@ -64,6 +70,6 @@ export default function Home() {
         <Text className="font-semibold">Today Only</Text>
         <Switch value={todayOnly} onToggle={setTodayOnly} />
       </HStack>
-    </ScreenWrapper>
+    </ScrollViewScreenWrapper>
   );
 }
