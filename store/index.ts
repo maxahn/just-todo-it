@@ -1,6 +1,7 @@
 import { createMergeableStore } from "tinybase/mergeable-store";
 
 export const SESSION_TABLE_ID = "sessions";
+export const SUB_SESSION_TABLE_ID = "sub_sessions";
 export const DISTRACTION_TABLE_ID = "distractions";
 export const TASK_TABLE_ID = "tasks";
 export const TASK_EXTRA_TABLE_ID = "tasks_extra";
@@ -41,9 +42,17 @@ store.setTablesSchema({
   [SESSION_TABLE_ID]: {
     id: { type: "string" },
     taskId: { type: "string" },
+    // start: { type: "string" },
+    // end: { type: "string" },
+    // distractionCount: { type: "number", default: 0 },
+  },
+  [SUB_SESSION_TABLE_ID]: {
+    id: { type: "string" },
+    sessionId: { type: "string" },
     start: { type: "string" },
     end: { type: "string" },
     distractionCount: { type: "number", default: 0 },
+    taskCompleted: { type: "boolean", default: false },
   },
   [DISTRACTION_TABLE_ID]: {
     id: { type: "string" },

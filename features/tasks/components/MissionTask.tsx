@@ -29,13 +29,8 @@ export function MissionTask({ id, onDefer }: MissionTaskProps) {
     ? isAfter(dueDate, new Date().setHours(0, 0, 0, 0)) || !isToday(dueDate)
     : false;
 
-  const {
-    isCompleting,
-    completeTask,
-    setActiveTaskId,
-    startSession,
-    updateTaskExtra,
-  } = useTasksAndSessions();
+  const { isCompleting, completeTask, startTask, updateTaskExtra } =
+    useTasksAndSessions();
 
   const handleCompleteTask = async () => {
     try {
@@ -59,11 +54,7 @@ export function MissionTask({ id, onDefer }: MissionTaskProps) {
   };
 
   const handleStartTask = async () => {
-    try {
-      await Promise.all([setActiveTaskId(id), startSession(id)]);
-    } catch (error) {
-      console.log({ error });
-    }
+    startTask(id);
   };
 
   return (

@@ -95,7 +95,7 @@ export default function TaskTimer({ id }: TaskTimerProps) {
         offset={offset}
         estimatedSeconds={estimatedSeconds}
         isPaused={isTimerPaused}
-        onToggleIsPaused={() => toggleIsTaskPaused(id)}
+        onToggleIsPaused={toggleIsTaskPaused}
         hideControls
       />
 
@@ -104,7 +104,7 @@ export default function TaskTimer({ id }: TaskTimerProps) {
           size="lg"
           action="negative"
           className="rounded-full w-16 h-16"
-          onPress={() => toggleIsTaskPaused(id)}
+          onPress={toggleIsTaskPaused}
         >
           <ButtonIcon
             className="w-7 h-7"

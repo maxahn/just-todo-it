@@ -4,6 +4,7 @@ import { store, TASK_TABLE_ID } from ".";
 export const QUERY_ID = {
   incompleteTasks: "incompleteTasks",
   activeTaskSessions: "activeSessions",
+  activeTaskSubSessions: "activeSubSessions",
 };
 
 export const queries = createQueries(store).setQueryDefinition(

@@ -6,7 +6,6 @@ export async function authenticatedFetch<T>(
   token?: string,
 ) {
   const authToken = !token ? await getAuthToken() : token;
-  console.log({ authToken });
   if (!authToken) throw new Error("Auth token not provided.");
   const response = await fetch(`https://api.todoist.com/rest/v2${path}`, {
     ...init,
@@ -15,7 +14,6 @@ export async function authenticatedFetch<T>(
       ...init?.headers,
     },
   });
-  console.log({ response });
 
   if (!response.ok) {
     throw new Error(response.statusText || "Network response was not ok");

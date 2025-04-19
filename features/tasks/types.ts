@@ -20,6 +20,8 @@ export type TodoistTask = {
     date: string; // "2016-09-04"
     lang: string;
   } | null;
+  // NOTE: Whilst duration exists in the Todoist API, it is not used in the app
+  // Instead we use estimatedDuration in the TaskExtra table
   // duration: {
   //   amount: number;
   //   unit: "minute" | "day"; // "minute"
@@ -71,8 +73,15 @@ export type TaskUpdate = Partial<Omit<Task, "id" | "createdAt">>;
 export type Session = {
   id: string;
   taskId: string;
+  // start: string;
+  // end?: string;
+  // taskCompleted?: boolean;
+};
+
+export type SubSession = {
+  sessionId: string;
+  distractionCount: number;
   start: string;
   end?: string;
   taskCompleted?: boolean;
 };
-// [string, string | null]; // start and end timestamp, if null, not ended
