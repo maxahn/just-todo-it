@@ -1,5 +1,3 @@
-import { Card } from "@/components/ui/card";
-import { Text } from "@/components/ui/text";
 import { useTasksAndSessions } from "../hooks/useActiveMission";
 import Stopwatch from "./Stopwatch";
 import { HStack } from "@/components/ui/hstack";
@@ -13,26 +11,19 @@ import {
   ChevronUp,
   PauseIcon,
   PlayIcon,
-  X,
 } from "lucide-react-native";
-import { formatSession, secondsToFormattedTime } from "../utils/formatTime";
-import { parseISO } from "date-fns";
 import Animated, { LinearTransition } from "react-native-reanimated";
 import useAppState from "@/hooks/useAppStateChange";
-import {
-  SUB_SESSION_TABLE_ID,
-  TASK_EXTRA_TABLE_ID,
-  TASK_TABLE_ID,
-} from "@/store";
-import { useResultSortedRowIds, useRow } from "tinybase/ui-react";
-import { SubSession, Task, TaskExtra } from "../types";
-import { QUERY_ID } from "@/store/queries";
+import { TASK_EXTRA_TABLE_ID, TASK_TABLE_ID } from "@/store";
+import { useRow } from "tinybase/ui-react";
+import { Task, TaskExtra } from "../types";
 import {
   useActiveSubSessionsTable,
-  useActiveTaskSessionsTable,
+  useSortedSubSessionIds,
 } from "@/store/hooks/queries/useActiveSessionsQuery";
 import { sumSessionsDurationTable } from "../utils/sumSessionsDurationMs";
 import { Redirect } from "expo-router";
+import { SubSessionCard } from "./SubSessionCard";
 
 const DEFAULT_ESTIMATE_SECONDS = 25 * 60;
 function getEstimateSeconds(duration: number | undefined) {
@@ -40,17 +31,15 @@ function getEstimateSeconds(duration: number | undefined) {
 }
 
 interface TaskTimerProps {
-  id: string;
+  taskId: string;
+  sessionId: string;
 }
 
-export default function TaskTimer({ id }: TaskTimerProps) {
-  const task = useRow(TASK_TABLE_ID, id) as Task;
-  const taskExtra = useRow(TASK_EXTRA_TABLE_ID, id) as TaskExtra;
-  const sessions = useResultSortedRowIds(
-    QUERY_ID.activeTaskSessions,
-    "start",
-    false,
-  );
+export default function TaskTimer({ taskId, sessionId }: TaskTimerProps) {
+  const task = useRow(TASK_TABLE_ID, taskId) as Task;
+  const taskExtra = useRow(TASK_EXTRA_TABLE_ID, taskId) as TaskExtra;
+  const { sortedIds: subSessionIds, queryId: subSessionQueryId } =
+    useSortedSubSessionIds(sessionId);
 
   const [sessionsVisible, setSessionsVisible] = useState(false);
   const [offset, setOffset] = useState(0);
@@ -59,7 +48,7 @@ export default function TaskTimer({ id }: TaskTimerProps) {
     completeTask,
     toggleIsTaskPaused,
     activeSessionId,
-    removeSession,
+    removeSubSession,
     cancelSession,
     activeTaskId,
   } = useTasksAndSessions();
@@ -69,8 +58,8 @@ export default function TaskTimer({ id }: TaskTimerProps) {
 
   const handleCompleteTask = async () => {
     try {
-      if (!id) throw new Error("No active task");
-      await completeTask(id);
+      if (!taskId) throw new Error("No active task");
+      await completeTask(taskId);
     } catch (error) {
       console.log({ error });
     }
@@ -81,10 +70,8 @@ export default function TaskTimer({ id }: TaskTimerProps) {
   };
 
   useEffect(() => {
-    if (appState === "active" && id) {
-      console.log({ subSessionsTable });
+    if (appState === "active" && taskId) {
       const totalSessionsDuration = sumSessionsDurationTable(subSessionsTable); // getTotalSessionsDuration();
-      console.log({ totalSessionsDuration });
       setOffset(-totalSessionsDuration);
     }
   }, [appState, subSessionsTable]);
@@ -146,49 +133,18 @@ export default function TaskTimer({ id }: TaskTimerProps) {
         </HStack>
         {sessionsVisible ? (
           <Animated.FlatList
-            data={sessions}
+            data={subSessionIds}
             itemLayoutAnimation={LinearTransition}
             inverted
             keyExtractor={(item) => item[0]}
             contentContainerStyle={{ gap: 8 }}
-            renderItem={({ item, index }) => {
-              const subSession = useRow(
-                SUB_SESSION_TABLE_ID,
-                item,
-              ) as SubSession;
-              const { start, end } = subSession;
+            renderItem={({ item }) => {
               return (
-                <Card>
-                  <HStack className="flex justify-between items-center">
-                    <VStack className="flex align-center">
-                      {end ? (
-                        <Text className="text-bold">
-                          {secondsToFormattedTime(
-                            Math.floor(
-                              (parseISO(end).getTime() -
-                                parseISO(start).getTime()) /
-                                1000,
-                            ),
-                          )}
-                        </Text>
-                      ) : null}
-                      <Text size="xs" className="inline-block align-middle">
-                        {formatSession([start, end || null])}
-                      </Text>
-                    </VStack>
-                    <Button
-                      size="sm"
-                      variant="link"
-                      className="rounded-full p-2"
-                      action="secondary"
-                      onPress={() => {
-                        removeSession(index);
-                      }}
-                    >
-                      <ButtonIcon as={X} />
-                    </Button>
-                  </HStack>
-                </Card>
+                <SubSessionCard
+                  queryId={subSessionQueryId}
+                  subSessionId={item}
+                  onRemove={removeSubSession}
+                />
               );
             }}
           />

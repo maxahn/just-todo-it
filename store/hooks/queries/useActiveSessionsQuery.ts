@@ -3,9 +3,9 @@ import { QUERY_ID } from "@/store/queries";
 import { useEffect } from "react";
 import {
   useQueries,
-  useResultSortedRowIds,
   useResultTable,
   useRow,
+  useResultSortedRowIds,
   useStore,
 } from "tinybase/ui-react";
 
@@ -37,7 +37,7 @@ export function useActiveSubSessionsQuery(sessionId: string) {
   const queries = useQueries();
   if (!queries)
     throw new Error("Please call within a TinyBaseProvider with queries");
-  const queryId = `${QUERY_ID.activeTaskSessions}_${sessionId}`;
+  const queryId = `${QUERY_ID.activeTaskSubSessions}_${sessionId}`;
   useEffect(() => {
     queries.setQueryDefinition(
       queryId,
@@ -54,6 +54,16 @@ export function useActiveSubSessionsQuery(sessionId: string) {
   }, [queries, sessionId]);
 
   return queryId;
+}
+
+export function useSortedSubSessionIds(sessionId: string) {
+  const activeSubSessionsQueryId = useActiveSubSessionsQuery(sessionId);
+  const sortedSubSessionIds = useResultSortedRowIds(
+    activeSubSessionsQueryId,
+    "start",
+    true,
+  );
+  return { sortedIds: sortedSubSessionIds, queryId: activeSubSessionsQueryId };
 }
 
 export function useActiveTaskSessionsTable(taskId: string) {

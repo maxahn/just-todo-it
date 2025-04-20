@@ -9,7 +9,7 @@ import {
 } from "@/store";
 import { Box } from "@/components/ui/box";
 import React, { useEffect, useState } from "react";
-import { FlatList, ScrollView, TouchableOpacity, View } from "react-native";
+import { FlatList, ScrollView, TouchableOpacity } from "react-native";
 import {
   useStore,
   useSortedRowIds,
@@ -172,7 +172,7 @@ function TableList({
 } & Partial<React.ComponentProps<typeof FlatList>>) {
   const sortedRowIds = useSortedRowIds(tableId, sortField, desc) as string[];
   const sortedResultRowIds = useResultSortedRowIds(tableId, sortField, desc);
-  console.log({ sortedResultRowIds });
+
   return (
     <FlatList
       {...rest}

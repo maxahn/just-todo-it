@@ -25,7 +25,6 @@ export default function CurrentTask() {
     setActiveTaskId,
   } = useTasksAndSessions();
   const activeSubSession = useRow(SUB_SESSION_TABLE_ID, activeSubSessionId);
-  console.log("activeSubSession", activeSubSession);
 
   function initializeActiveMission() {
     if (!sortedIncompleteTaskIds?.length || (activeTaskId && activeSessionId)) {
@@ -41,10 +40,7 @@ export default function CurrentTask() {
     initializeActiveMission();
   }
 
-  console.log({ activeTaskId });
   useEffect(() => {
-    console.log("-----");
-    console.log({ activeTaskId });
     if (activeTaskId && sortedIncompleteTaskIds.includes(activeTaskId)) return;
     initializeActiveMission();
   }, [sortedIncompleteTaskIds, todayOnly, activeTaskId]);

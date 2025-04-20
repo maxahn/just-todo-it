@@ -30,7 +30,7 @@ export interface TasksContextState {
   getIsActive: () => boolean;
   toggleIsTaskPaused: () => void;
   getTotalSessionsDuration: () => number;
-  removeSession: (index: number) => void;
+  removeSubSession: (id: string) => void;
   handleFetchAndSyncTasks: () => Promise<void>;
   isSyncing: boolean;
   isCompleting: boolean;
@@ -55,7 +55,7 @@ export const TasksContext = createContext<TasksContextState>({
   getIsActive: () => false,
   toggleIsTaskPaused: () => {},
   getTotalSessionsDuration: () => 0,
-  removeSession: () => {},
+  removeSubSession: () => {},
   handleFetchAndSyncTasks: async () => {},
   isSyncing: false,
   isCompleting: false,
@@ -141,6 +141,10 @@ export function TasksProvider(
     setActiveSubSessionId("");
   };
 
+  const removeSubSession = (subSessionId: string) => {
+    store?.delRow(SUB_SESSION_TABLE_ID, subSessionId);
+  };
+
   const startTask = (taskId: string) => {
     setActiveTaskId(taskId);
     startSession(taskId);
@@ -170,7 +174,6 @@ export function TasksProvider(
   const toggleIsTaskPaused = () => {
     if (!activeSessionId) throw new Error("No active session");
     if (isTimerPaused) {
-      // startSession(taskId);
       startSubSession(activeSessionId);
       setIsTimerPaused(false);
       return;
@@ -183,7 +186,6 @@ export function TasksProvider(
     handleFetchAndSyncTasks();
   }, [store]);
 
-  console.log({ activeSessionId, activeSubSessionId });
   return (
     <TasksContext.Provider
       value={{
@@ -207,7 +209,7 @@ export function TasksProvider(
         getIsActive: () => false,
         toggleIsTaskPaused,
         getTotalSessionsDuration: () => 0,
-        removeSession: () => {},
+        removeSubSession,
         handleFetchAndSyncTasks,
       }}
       {...props}
