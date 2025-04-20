@@ -14,7 +14,6 @@ import {
   useStore,
   useSortedRowIds,
   useRow,
-  useResultTable,
   useResultSortedRowIds,
   useResultRow,
 } from "tinybase/ui-react";
@@ -24,12 +23,9 @@ import { Heading } from "@/components/ui/heading";
 import { useActiveSessionsQuery } from "@/store/hooks/queries/useActiveSessionsQuery";
 
 export default function Summary() {
-  const [activeTable, setActiveTable] = useState<string>(SESSION_TABLE_ID);
+  const [activeTable, setActiveTable] = useState<string>(TASK_TABLE_ID);
   const [activeTaskId, setActiveTaskId] = useState<string>("");
   const queryId = useActiveSessionsQuery(activeTaskId);
-  console.log("queryId", queryId);
-  const resultIds = useResultSortedRowIds(queryId);
-  console.log("resultTable", resultIds);
   const store = useStore();
 
   const handleItemPress = (id: string) => {
@@ -110,7 +106,13 @@ export default function Summary() {
             isDisabled={activeTable === queryId}
             onPress={() => setActiveTable(queryId)}
           >
-            <ButtonText>{queryId || "No task selected"}</ButtonText>
+            <ButtonText>{queryId || "N/A"}</ButtonText>
+          </Button>
+          <Button
+            isDisabled={activeTable === TASK_TABLE_ID}
+            onPress={() => setActiveTable(TASK_TABLE_ID)}
+          >
+            <ButtonText>Tasks</ButtonText>
           </Button>
           <Button
             isDisabled={activeTable === SESSION_TABLE_ID}
@@ -123,12 +125,6 @@ export default function Summary() {
             onPress={() => setActiveTable(SUB_SESSION_TABLE_ID)}
           >
             <ButtonText>Sub Sessions</ButtonText>
-          </Button>
-          <Button
-            isDisabled={activeTable === TASK_TABLE_ID}
-            onPress={() => setActiveTable(TASK_TABLE_ID)}
-          >
-            <ButtonText>Tasks</ButtonText>
           </Button>
           <Button
             isDisabled={activeTable === TASK_EXTRA_TABLE_ID}

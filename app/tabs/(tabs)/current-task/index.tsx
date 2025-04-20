@@ -12,7 +12,7 @@ import { SUB_SESSION_TABLE_ID } from "@/store";
 import { useRow } from "tinybase/ui-react";
 import _ from "lodash";
 
-export default function Home() {
+export default function CurrentTask() {
   const [deferOffset, setDeferOffset] = useState(0);
   const [todayOnly, setTodayOnly] = useState(true);
   const sortedIncompleteTaskIds = useSortedIncompleteTasks();

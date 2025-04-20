@@ -27,7 +27,10 @@ import {
 import { useResultSortedRowIds, useRow } from "tinybase/ui-react";
 import { SubSession, Task, TaskExtra } from "../types";
 import { QUERY_ID } from "@/store/queries";
-import { useActiveTaskSessionsTable } from "@/store/hooks/queries/useActiveSessionsQuery";
+import {
+  useActiveSubSessionsTable,
+  useActiveTaskSessionsTable,
+} from "@/store/hooks/queries/useActiveSessionsQuery";
 import { sumSessionsDurationTable } from "../utils/sumSessionsDurationMs";
 import { Redirect } from "expo-router";
 
@@ -48,7 +51,6 @@ export default function TaskTimer({ id }: TaskTimerProps) {
     "start",
     false,
   );
-  const sessionsTable = useActiveTaskSessionsTable(id);
 
   const [sessionsVisible, setSessionsVisible] = useState(false);
   const [offset, setOffset] = useState(0);
@@ -61,6 +63,7 @@ export default function TaskTimer({ id }: TaskTimerProps) {
     cancelSession,
     activeTaskId,
   } = useTasksAndSessions();
+  const subSessionsTable = useActiveSubSessionsTable(activeSessionId);
   const appState = useAppState();
   const estimatedSeconds = getEstimateSeconds(taskExtra?.estimatedDuration);
 
@@ -79,10 +82,12 @@ export default function TaskTimer({ id }: TaskTimerProps) {
 
   useEffect(() => {
     if (appState === "active" && id) {
-      const totalSessionsDuration = sumSessionsDurationTable(sessionsTable); // getTotalSessionsDuration();
+      console.log({ subSessionsTable });
+      const totalSessionsDuration = sumSessionsDurationTable(subSessionsTable); // getTotalSessionsDuration();
+      console.log({ totalSessionsDuration });
       setOffset(-totalSessionsDuration);
     }
-  }, [appState, sessionsTable]);
+  }, [appState, subSessionsTable]);
 
   if (!activeSessionId || !activeTaskId)
     return <Redirect href="/tabs/(tabs)/current-task" />;

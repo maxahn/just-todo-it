@@ -168,15 +168,14 @@ export function TasksProvider(
 
   const toggleIsTaskPaused = () => {
     if (!activeSessionId) throw new Error("No active session");
-    const isTimerPaused = store?.getValue("isTimerPaused");
     if (isTimerPaused) {
       // startSession(taskId);
       startSubSession(activeSessionId);
-      store?.setValue("isTimerPaused", false);
+      setIsTimerPaused(false);
       return;
     }
     finishSubSession();
-    store?.setValue("isTimerPaused", true);
+    setIsTimerPaused(true);
   };
 
   useEffect(() => {

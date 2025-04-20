@@ -1,11 +1,11 @@
 import { parseISO } from "date-fns";
-import type { Session } from "../types";
+import type { Session, SubSession } from "../types";
 import { Table } from "tinybase/store";
 
 export function sumSessionsDurationTable(table: Table): number {
   let totalDuration = 0;
   for (const rowId in table) {
-    const session = table[rowId] as Session;
+    const session = table[rowId] as SubSession;
     const { start, end } = session;
     const workingEnd = end || new Date().toISOString();
     const msDuration =
@@ -15,7 +15,7 @@ export function sumSessionsDurationTable(table: Table): number {
   return Math.floor(totalDuration / 1000);
 }
 
-export function sumSessionsDuration(sessions: Session[]): number {
+export function sumSessionsDuration(sessions: SubSession[]): number {
   return sessions.reduce((acc, session) => {
     const { start, end } = session;
     const workingEnd = end || new Date().toISOString();

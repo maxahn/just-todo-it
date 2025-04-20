@@ -38,14 +38,14 @@ export function useActiveSubSessionsQuery(sessionId: string) {
   if (!queries)
     throw new Error("Please call within a TinyBaseProvider with queries");
   return useMemo(() => {
-    const queryId = `${QUERY_ID.activeTaskSubSessions}_${sessionId}`;
+    const queryId = `${QUERY_ID.activeTaskSessions}_${sessionId}`;
     queries.setQueryDefinition(
       queryId,
       SUB_SESSION_TABLE_ID,
       ({ select, where }) => {
-        select("id");
         select("start");
         select("end");
+        select("sessionId");
         select("distractionCount");
         select("taskCompleted");
         where("sessionId", sessionId);
@@ -67,6 +67,18 @@ export function useActiveTaskSessionsTable(taskId: string) {
   });
   //   return activeTaskSubSessions;
   return activeTaskSessions;
+}
+
+export function useActiveSubSessionsTable(sessionId: string) {
+  const activeSubSessionsQueryId = useActiveSubSessionsQuery(sessionId);
+  const activeSubSessions = useResultTable(activeSubSessionsQueryId);
+  console.log("-----");
+  console.log({
+    sessionId,
+    activeSubSessionsQueryId,
+    activeSubSessions,
+  });
+  return activeSubSessions;
 }
 
 export function useActiveTaskSessionIds(taskId: string) {
