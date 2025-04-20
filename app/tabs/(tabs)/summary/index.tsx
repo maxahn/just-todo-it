@@ -9,7 +9,7 @@ import {
 } from "@/store";
 import { Box } from "@/components/ui/box";
 import React, { useEffect, useState } from "react";
-import { FlatList, ScrollView, TouchableOpacity } from "react-native";
+import { FlatList, ScrollView, TouchableOpacity, View } from "react-native";
 import {
   useStore,
   useSortedRowIds,
@@ -21,11 +21,15 @@ import { HStack } from "@/components/ui/hstack";
 import { Button, ButtonText } from "@/components/ui/button";
 import { Heading } from "@/components/ui/heading";
 import { useActiveSessionsQuery } from "@/store/hooks/queries/useActiveSessionsQuery";
+import { useTasksAndSessions } from "@/features/tasks/hooks/useActiveMission";
+import { VStack } from "@/components/ui/vstack";
 
 export default function Summary() {
+  const { activeSessionId, activeSubSessionId, activeTaskId, isTimerPaused } =
+    useTasksAndSessions();
   const [activeTable, setActiveTable] = useState<string>(TASK_TABLE_ID);
-  const [activeTaskId, setActiveTaskId] = useState<string>("");
-  const queryId = useActiveSessionsQuery(activeTaskId);
+  const [selectedTaskId, setSelectedTaskId] = useState<string>(activeTaskId);
+  const queryId = useActiveSessionsQuery(selectedTaskId);
   const store = useStore();
 
   const handleItemPress = (id: string) => {
@@ -37,7 +41,7 @@ export default function Summary() {
         // setActiveTable(TASK_TABLE_ID);
         break;
       case TASK_TABLE_ID:
-        setActiveTaskId(id);
+        setSelectedTaskId(id);
         break;
       default:
         break;
@@ -64,7 +68,7 @@ export default function Summary() {
   };
 
   let sortField = undefined;
-  let desc = false;
+  let desc = true;
   const isResultTable = activeTable === queryId;
   switch (activeTable) {
     case SUB_SESSION_TABLE_ID:
@@ -93,46 +97,60 @@ export default function Summary() {
           <ButtonText>Delete</ButtonText>
         </Button>
       </HStack>
-      <TableList
-        tableId={activeTable}
-        onItemPress={handleItemPress}
-        sortField={sortField}
-        desc={desc}
-        isResultTable={isResultTable}
-      />
-      <ScrollView horizontal>
-        <HStack className="gap-2 flex-0">
-          <Button
-            isDisabled={activeTable === queryId}
-            onPress={() => setActiveTable(queryId)}
-          >
-            <ButtonText>{queryId || "N/A"}</ButtonText>
-          </Button>
-          <Button
-            isDisabled={activeTable === TASK_TABLE_ID}
-            onPress={() => setActiveTable(TASK_TABLE_ID)}
-          >
-            <ButtonText>Tasks</ButtonText>
-          </Button>
-          <Button
-            isDisabled={activeTable === SESSION_TABLE_ID}
-            onPress={() => setActiveTable(SESSION_TABLE_ID)}
-          >
-            <ButtonText>Sessions</ButtonText>
-          </Button>
-          <Button
-            isDisabled={activeTable === SUB_SESSION_TABLE_ID}
-            onPress={() => setActiveTable(SUB_SESSION_TABLE_ID)}
-          >
-            <ButtonText>Sub Sessions</ButtonText>
-          </Button>
-          <Button
-            isDisabled={activeTable === TASK_EXTRA_TABLE_ID}
-            onPress={() => setActiveTable(TASK_EXTRA_TABLE_ID)}
-          >
-            <ButtonText>Task Extra</ButtonText>
+      {activeTable ? (
+        // <Box className="flex-1">
+        <TableList
+          tableId={activeTable}
+          onItemPress={handleItemPress}
+          sortField={sortField}
+          desc={desc}
+          isResultTable={isResultTable}
+        />
+      ) : (
+        <VStack>
+          <Text>Active Task ID: {activeTaskId}</Text>
+          <Text>Active Session ID: {activeSessionId}</Text>
+          <Text>Active Sub Session ID: {activeSubSessionId}</Text>
+          <Text>Is Timer Paused: {isTimerPaused.toString()}</Text>
+        </VStack>
+      )}
+      <ScrollView horizontal contentContainerClassName="gap-2 max-h-15">
+        <HStack className="gap-2">
+          <Button isDisabled={!activeTable} onPress={() => setActiveTable("")}>
+            <ButtonText>Values</ButtonText>
           </Button>
         </HStack>
+
+        <Button
+          isDisabled={activeTable === queryId}
+          onPress={() => setActiveTable(queryId)}
+        >
+          <ButtonText>{queryId || "N/A"}</ButtonText>
+        </Button>
+        <Button
+          isDisabled={activeTable === TASK_TABLE_ID}
+          onPress={() => setActiveTable(TASK_TABLE_ID)}
+        >
+          <ButtonText>Tasks</ButtonText>
+        </Button>
+        <Button
+          isDisabled={activeTable === SESSION_TABLE_ID}
+          onPress={() => setActiveTable(SESSION_TABLE_ID)}
+        >
+          <ButtonText>Sessions</ButtonText>
+        </Button>
+        <Button
+          isDisabled={activeTable === SUB_SESSION_TABLE_ID}
+          onPress={() => setActiveTable(SUB_SESSION_TABLE_ID)}
+        >
+          <ButtonText>Sub Sessions</ButtonText>
+        </Button>
+        <Button
+          isDisabled={activeTable === TASK_EXTRA_TABLE_ID}
+          onPress={() => setActiveTable(TASK_EXTRA_TABLE_ID)}
+        >
+          <ButtonText>Task Extra</ButtonText>
+        </Button>
       </ScrollView>
     </ScreenWrapper>
   );

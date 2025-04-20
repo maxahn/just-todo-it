@@ -1,6 +1,6 @@
 import { SESSION_TABLE_ID, SUB_SESSION_TABLE_ID } from "@/store";
 import { QUERY_ID } from "@/store/queries";
-import { useMemo } from "react";
+import { useEffect } from "react";
 import {
   useQueries,
   useResultSortedRowIds,
@@ -13,8 +13,8 @@ export function useActiveSessionsQuery(taskId: string) {
   const queries = useQueries();
   if (!queries)
     throw new Error("Please call within a TinyBaseProvider with queries");
-  return useMemo(() => {
-    const queryId = `${QUERY_ID.activeTaskSessions}_${taskId}`;
+  const queryId = `${QUERY_ID.activeTaskSessions}_${taskId}`;
+  useEffect(() => {
     queries.setQueryDefinition(
       queryId,
       SUB_SESSION_TABLE_ID,
@@ -29,16 +29,16 @@ export function useActiveSessionsQuery(taskId: string) {
         where(SESSION_TABLE_ID, "taskId", taskId);
       },
     );
-    return queryId;
   }, [queries, taskId]);
+  return queryId;
 }
 
 export function useActiveSubSessionsQuery(sessionId: string) {
   const queries = useQueries();
   if (!queries)
     throw new Error("Please call within a TinyBaseProvider with queries");
-  return useMemo(() => {
-    const queryId = `${QUERY_ID.activeTaskSessions}_${sessionId}`;
+  const queryId = `${QUERY_ID.activeTaskSessions}_${sessionId}`;
+  useEffect(() => {
     queries.setQueryDefinition(
       queryId,
       SUB_SESSION_TABLE_ID,
@@ -51,8 +51,9 @@ export function useActiveSubSessionsQuery(sessionId: string) {
         where("sessionId", sessionId);
       },
     );
-    return queryId;
   }, [queries, sessionId]);
+
+  return queryId;
 }
 
 export function useActiveTaskSessionsTable(taskId: string) {

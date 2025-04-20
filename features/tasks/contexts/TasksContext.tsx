@@ -144,6 +144,7 @@ export function TasksProvider(
   const startTask = (taskId: string) => {
     setActiveTaskId(taskId);
     startSession(taskId);
+    setIsTimerPaused(false);
   };
 
   const completeTask = async (id: string) => {

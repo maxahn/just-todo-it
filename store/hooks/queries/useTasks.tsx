@@ -1,14 +1,16 @@
 import { TASK_TABLE_ID } from "@/store";
 import { QUERY_ID } from "@/store/queries";
-import { useMemo } from "react";
+import { useEffect } from "react";
 import { useQueries, useResultSortedRowIds } from "tinybase/ui-react";
 
 export function useIncompleteTasksQuery() {
   const queries = useQueries();
-  if (!queries)
-    throw new Error("Please call within a TinyBaseProvider with queries");
-  return useMemo(() => {
-    const queryId = QUERY_ID.incompleteTasks;
+
+  const queryId = QUERY_ID.incompleteTasks;
+
+  useEffect(() => {
+    if (!queries)
+      throw new Error("Please call within a TinyBaseProvider with queries");
     queries.setQueryDefinition(queryId, TASK_TABLE_ID, ({ select, where }) => {
       select("id");
       select("order");
@@ -27,8 +29,9 @@ export function useIncompleteTasksQuery() {
       select("assignerId");
       where("isCompleted", false);
     });
-    return queryId;
-  }, [queries]);
+  }, [queries, queryId]);
+
+  return queryId;
 }
 
 export const useSortedIncompleteTasks = () => {
