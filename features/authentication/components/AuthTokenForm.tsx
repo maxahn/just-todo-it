@@ -9,11 +9,13 @@ import { Link } from "@/components/ui/link";
 
 interface AuthTokenFormProps extends IInputFieldProps {
   onSubmit?: () => void;
+  containerProps?: React.ComponentProps<typeof VStack>;
 }
 
 export function AuthTokenForm({
   onSubmit,
   value,
+  containerProps,
   ...rest
 }: AuthTokenFormProps) {
   const [isSaving, setIsSaving] = useState(false);
@@ -32,7 +34,11 @@ export function AuthTokenForm({
   };
 
   return (
-    <VStack className="h-full flex justify-center" space="xl">
+    <VStack
+      className="h-full flex justify-center"
+      space="xl"
+      {...containerProps}
+    >
       <VStack space="xs">
         <Link href="https://www.todoist.com/help/articles/find-your-api-token-Jpzx9IIlB">
           <Text className="text-info-400">
