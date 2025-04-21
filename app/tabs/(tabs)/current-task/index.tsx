@@ -27,7 +27,9 @@ export default function CurrentTask() {
   const activeSubSession = useRow(SUB_SESSION_TABLE_ID, activeSubSessionId);
 
   function initializeActiveMission() {
-    if (!sortedIncompleteTaskIds?.length || (activeTaskId && activeSessionId)) {
+    const isTimerActive = Boolean(activeTaskId) && Boolean(activeSessionId);
+    console.log({ isTimerActive });
+    if (!sortedIncompleteTaskIds?.length || isTimerActive) {
       return;
     }
     const nextActiveTaskId = sortedIncompleteTaskIds[0 + deferOffset];
@@ -41,7 +43,11 @@ export default function CurrentTask() {
   }
 
   useEffect(() => {
-    if (activeTaskId && sortedIncompleteTaskIds.includes(activeTaskId)) return;
+    console.log({ activeTaskId });
+    const sortedListIncludesTaskId =
+      sortedIncompleteTaskIds.includes(activeTaskId);
+    console.log({ sortedListIncludesTaskId });
+    if (activeTaskId && sortedListIncludesTaskId) return;
     initializeActiveMission();
   }, [sortedIncompleteTaskIds, todayOnly, activeTaskId]);
 
@@ -51,7 +57,6 @@ export default function CurrentTask() {
   };
 
   if (activeTaskId && !_.isEmpty(activeSubSession)) {
-    console.log("redirecting to timer");
     return <Redirect href="./current-task/timer" />;
   }
 

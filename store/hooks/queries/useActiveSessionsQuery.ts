@@ -69,26 +69,12 @@ export function useSortedSubSessionIds(sessionId: string) {
 export function useActiveTaskSessionsTable(taskId: string) {
   const activeTaskSessionsQueryId = useActiveSessionsQuery(taskId);
   const activeTaskSessions = useResultTable(activeTaskSessionsQueryId);
-  //   const activeTaskSubSessionsQueryId = useActiveSubSessionsQuery(taskId);
-  //   const activeTaskSubSessions = useResultTable(activeTaskSubSessionsQueryId);
-  console.log({
-    activeTaskSessionsQueryId,
-    activeTaskSessions,
-    // activeTaskSubSessions,
-  });
-  //   return activeTaskSubSessions;
   return activeTaskSessions;
 }
 
 export function useActiveSubSessionsTable(sessionId: string) {
   const activeSubSessionsQueryId = useActiveSubSessionsQuery(sessionId);
   const activeSubSessions = useResultTable(activeSubSessionsQueryId);
-  console.log("-----");
-  console.log({
-    sessionId,
-    activeSubSessionsQueryId,
-    activeSubSessions,
-  });
   return activeSubSessions;
 }
 

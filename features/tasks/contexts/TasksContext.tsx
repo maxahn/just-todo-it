@@ -147,8 +147,6 @@ export function TasksProvider(
   };
 
   const completeTask = async (id: string) => {
-    if (!id) throw new Error("No active task");
-    // TODO: refactor to sync local and remote data
     const completeTaskPromise = completeTaskAsync({ id });
     const updateTaskPromise = updateTask(id, { isCompleted: true });
     if (activeSessionId) {

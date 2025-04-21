@@ -65,7 +65,6 @@ export function MissionTask({ id, onDefer }: MissionTaskProps) {
   };
 
   useEffect(() => {
-    console.log({ task });
     if (_.isEmpty(task)) {
       setActiveTaskId("");
     }
