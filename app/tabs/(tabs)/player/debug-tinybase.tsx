@@ -18,15 +18,23 @@ import {
   useResultRow,
 } from "tinybase/ui-react";
 import { HStack } from "@/components/ui/hstack";
-import { Button, ButtonText } from "@/components/ui/button";
+import { Button, ButtonIcon, ButtonText } from "@/components/ui/button";
 import { Heading } from "@/components/ui/heading";
 import { useActiveSessionsQuery } from "@/store/hooks/queries/useActiveSessionsQuery";
 import { useTasksAndSessions } from "@/features/tasks/hooks/useActiveMission";
 import { VStack } from "@/components/ui/vstack";
+import { X } from "lucide-react-native";
 
 export default function Summary() {
-  const { activeSessionId, activeSubSessionId, activeTaskId, isTimerPaused } =
-    useTasksAndSessions();
+  const {
+    activeSessionId,
+    activeSubSessionId,
+    activeTaskId,
+    isTimerPaused,
+    setActiveTaskId,
+    setActiveSubSessionId,
+    setActiveSessionId,
+  } = useTasksAndSessions();
   const [activeTable, setActiveTable] = useState<string>(TASK_TABLE_ID);
   const [selectedTaskId, setSelectedTaskId] = useState<string>(activeTaskId);
   const queryId = useActiveSessionsQuery(selectedTaskId);
@@ -107,10 +115,37 @@ export default function Summary() {
           isResultTable={isResultTable}
         />
       ) : (
-        <VStack>
-          <Text>Active Task ID: {activeTaskId}</Text>
-          <Text>Active Session ID: {activeSessionId}</Text>
-          <Text>Active Sub Session ID: {activeSubSessionId}</Text>
+        <VStack className="gap-1">
+          <HStack className="justify-between items-center">
+            <Text>Active Task ID: {activeTaskId}</Text>
+            <Button
+              onPress={() => setActiveTaskId("")}
+              action="negative"
+              variant="link"
+            >
+              <ButtonIcon as={X} />
+            </Button>
+          </HStack>
+          <HStack className="justify-between items-center">
+            <Text>Active Session ID: {activeSessionId}</Text>
+            <Button
+              onPress={() => setActiveSessionId("")}
+              action="negative"
+              variant="link"
+            >
+              <ButtonIcon as={X} />
+            </Button>
+          </HStack>
+          <HStack className="justify-between items-center">
+            <Text>Active Sub Session ID: {activeSubSessionId}</Text>
+            <Button
+              onPress={() => setActiveSubSessionId("")}
+              action="negative"
+              variant="link"
+            >
+              <ButtonIcon as={X} />
+            </Button>
+          </HStack>
           <Text>Is Timer Paused: {isTimerPaused.toString()}</Text>
         </VStack>
       )}

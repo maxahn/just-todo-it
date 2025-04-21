@@ -19,7 +19,6 @@ export interface TasksContextState {
   setActiveTaskId: (id: string) => void;
   setActiveSessionId: (id: string) => void;
   setActiveSubSessionId: (id: string) => void;
-  setIsTimerPaused: (paused: boolean) => void;
   updateTask: (id: string, update: TaskUpdate) => void;
   updateTaskExtra: (id: string, update: TaskExtraUpdate) => void;
   completeTask: (id: string) => Promise<void>;
@@ -44,7 +43,6 @@ export const TasksContext = createContext<TasksContextState>({
   setActiveTaskId: () => {},
   setActiveSessionId: () => {},
   setActiveSubSessionId: () => {},
-  setIsTimerPaused: () => {},
   updateTask: () => {},
   updateTaskExtra: () => {},
   startSession: () => {},
@@ -67,12 +65,14 @@ export function TasksProvider(
   const [isSyncing, setIsSyncing] = useState(false);
   const store = useStore();
   const activeTaskId = useValue("activeTaskId") as string;
-  const isTimerPaused = useValue("isTimerPaused") as boolean;
+  // const isTimerPaused = useValue("isTimerPaused") as boolean;
   const activeSessionId = useValue("activeSessionId") as string;
   const activeSubSessionId = useValue("activeSubSessionId") as string;
   const { mutateAsync: completeTaskAsync, isPending: isCompleting } =
     useCompleteTaskMutation();
   const deleteSubSessions = useDeleteSubSessions(activeSessionId);
+
+  const isTimerPaused = Boolean(activeSessionId) && !activeSubSessionId;
   // const tasksTable = useTable(TASK_TABLE_ID)
 
   const handleFetchAndSyncTasks = async () => {
@@ -89,10 +89,6 @@ export function TasksProvider(
 
   const setActiveSessionId = (id: string) => {
     store?.setValue("activeSessionId", id);
-  };
-
-  const setIsTimerPaused = (paused: boolean) => {
-    store?.setValue("isTimerPaused", paused);
   };
 
   const setActiveSubSessionId = (id: string) => {
@@ -148,7 +144,6 @@ export function TasksProvider(
   const startTask = (taskId: string) => {
     setActiveTaskId(taskId);
     startSession(taskId);
-    setIsTimerPaused(false);
   };
 
   const completeTask = async (id: string) => {
@@ -175,11 +170,9 @@ export function TasksProvider(
     if (!activeSessionId) throw new Error("No active session");
     if (isTimerPaused) {
       startSubSession(activeSessionId);
-      setIsTimerPaused(false);
       return;
     }
     finishSubSession();
-    setIsTimerPaused(true);
   };
 
   useEffect(() => {
@@ -196,7 +189,6 @@ export function TasksProvider(
         activeSubSessionId,
         isTimerPaused,
         setActiveSessionId,
-        setIsTimerPaused,
         setActiveTaskId,
         setActiveSubSessionId,
         updateTask,

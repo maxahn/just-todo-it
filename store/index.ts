@@ -12,7 +12,6 @@ store.setValuesSchema({
   activeTaskId: { type: "string", default: "" },
   activeSessionId: { type: "string", default: "" }, // !!!!
   activeSubSessionId: { type: "string", default: "" }, // !!!!
-  isTimerPaused: { type: "boolean", default: false }, // should timer be paused
 });
 
 store.setTablesSchema({
