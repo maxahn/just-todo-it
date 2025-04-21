@@ -1,11 +1,13 @@
 import { Button, ButtonText } from "@/components/ui/button";
 import { VStack } from "@/components/ui/vstack";
+import { Text } from "@/components/ui/text";
 import { ScrollViewScreenWrapper } from "@/components/ui/wrapper/ScreenWrapper";
 import { AuthTokenForm } from "@/features/authentication/components/AuthTokenForm";
 import { getAuthToken } from "@/features/authentication/util/getAuthToken";
 import { useRouter } from "expo-router";
 import { Box } from "@/components/ui/box";
 import { useEffect, useState } from "react";
+import Constants from "expo-constants";
 
 export default function Player() {
   const [apiKey, setApiKey] = useState("");
@@ -22,6 +24,16 @@ export default function Player() {
 
   return (
     <ScrollViewScreenWrapper className="flex flex-col justify-end">
+      <Box>
+        <Text>Expo Version: {Constants.expoVersion}</Text>
+        <Text>Expo Runtime Version: {Constants.expoRuntimeVersion}</Text>
+        <Text>Expo Build Number: {Constants.expoBuildNumber}</Text>
+        <Text>Expo Runtime Version: {Constants.expoRuntimeVersion}</Text>
+        <Text>
+          Expo Config Extra:{" "}
+          {JSON.stringify(Constants.expoConfig?.extra, null, 2)}
+        </Text>
+      </Box>
       <Box className="flex-1" />
       <Button
         className="mb-8"
