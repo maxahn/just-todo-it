@@ -25,14 +25,21 @@ export default function Player() {
   return (
     <ScrollViewScreenWrapper className="flex flex-col justify-end">
       <Box>
-        <Text>Expo Version: {Constants.expoVersion}</Text>
         <Text>Expo Runtime Version: {Constants.expoRuntimeVersion}</Text>
         <Text>Expo Build Number: {Constants.expoBuildNumber}</Text>
-        <Text>Expo Runtime Version: {Constants.expoRuntimeVersion}</Text>
-        <Text>
-          Expo Config Extra:{" "}
-          {JSON.stringify(Constants.expoConfig?.extra, null, 2)}
-        </Text>
+        <VStack>
+          <Text>Expo Config Extra: </Text>
+          {Object.entries(Constants.expoConfig?.extra || {}).map(
+            ([key, value]) => {
+              console.log({ key, value });
+              return (
+                <Text key={key}>
+                  {key}: {JSON.stringify(value)}
+                </Text>
+              );
+            },
+          )}
+        </VStack>
       </Box>
       <Box className="flex-1" />
       <Button
