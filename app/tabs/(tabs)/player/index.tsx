@@ -25,8 +25,9 @@ export default function Player() {
   return (
     <ScrollViewScreenWrapper className="flex flex-col justify-end">
       <Box>
-        <Text>Expo Runtime Version: {Constants.expoRuntimeVersion}</Text>
-        <Text>Expo Build Number: {Constants.expoBuildNumber}</Text>
+        {/* <Text>Expo Runtime Version: {Constants.expoRuntimeVersion}</Text>
+        <Text>Expo Build Number: {Constants.expoBuildNumber}</Text> */}
+        <Text>Expo Build Number: 0.1.1</Text>
         <VStack>
           <Text>Expo Config Extra: </Text>
           {Object.entries(Constants.expoConfig?.extra || {}).map(

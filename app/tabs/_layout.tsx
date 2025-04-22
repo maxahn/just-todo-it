@@ -12,7 +12,11 @@ import { Stack } from "expo-router";
 
 export default function AppLayout() {
   return (
-    <Stack>
+    <Stack
+      screenOptions={{
+        navigationBarColor: "#1E293B",
+      }}
+    >
       <Stack.Screen
         name="(tabs)"
         options={{

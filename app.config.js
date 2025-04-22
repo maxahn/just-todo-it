@@ -102,6 +102,9 @@ const config = {
       adaptiveIcon: AdaptiveIcon,
       random: "",
       package: routes.bundleIdentifier,
+      androidNavigationBar: {
+        backgroundColor: "#1E293B",
+      },
     },
     web: {
       bundler: "metro",
