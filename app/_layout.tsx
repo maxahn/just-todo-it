@@ -1,4 +1,5 @@
 import FontAwesome from "@expo/vector-icons/FontAwesome";
+import { StatusBar } from "expo-status-bar";
 import {
   DarkTheme,
   DefaultTheme,
@@ -65,6 +66,7 @@ export default function RootLayout() {
 
 function RootLayoutNav() {
   const colorScheme = useColorScheme();
+
   useAndStartPersister(store);
 
   return (
@@ -76,6 +78,7 @@ function RootLayoutNav() {
               <ThemeProvider
                 value={colorScheme === "dark" ? DarkTheme : DefaultTheme}
               >
+                <StatusBar style={colorScheme === "dark" ? "light" : "dark"} />
                 <Slot />
               </ThemeProvider>
             </GluestackUIProvider>
