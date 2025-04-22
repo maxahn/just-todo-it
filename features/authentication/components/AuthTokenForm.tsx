@@ -3,9 +3,9 @@ import { IInputFieldProps, ToggleSecureTextField } from "@/components/ui/input";
 import { VStack } from "@/components/ui/vstack";
 import { Button } from "@/components/ui/button";
 import { Text } from "@/components/ui/text";
-import { setAuthToken } from "../util/getAuthToken";
 import { useState } from "react";
 import { Link } from "@/components/ui/link";
+import { useAuth } from "../hooks/useAuth";
 
 interface AuthTokenFormProps extends IInputFieldProps {
   onSubmit?: () => void;
@@ -19,12 +19,13 @@ export function AuthTokenForm({
   ...rest
 }: AuthTokenFormProps) {
   const [isSaving, setIsSaving] = useState(false);
+  const { setAuthToken } = useAuth();
 
   const handleSubmit = async () => {
     try {
-      if (!value) throw new Error("Please enter a value");
+      // if (!value) throw new Error("Please enter a value");
       setIsSaving(true);
-      await setAuthToken(value);
+      await setAuthToken(value || "");
       if (onSubmit) onSubmit();
     } catch (error: any) {
       console.log({ error });

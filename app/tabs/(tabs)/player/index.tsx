@@ -31,7 +31,6 @@ export default function Player() {
           <Text>Expo Config Extra: </Text>
           {Object.entries(Constants.expoConfig?.extra || {}).map(
             ([key, value]) => {
-              console.log({ key, value });
               return (
                 <Text key={key}>
                   {key}: {JSON.stringify(value)}

@@ -28,7 +28,6 @@ export default function CurrentTask() {
 
   function initializeActiveMission() {
     const isTimerActive = Boolean(activeTaskId) && Boolean(activeSessionId);
-    console.log({ isTimerActive });
     if (!sortedIncompleteTaskIds?.length || isTimerActive) {
       return;
     }
@@ -43,10 +42,8 @@ export default function CurrentTask() {
   }
 
   useEffect(() => {
-    console.log({ activeTaskId });
     const sortedListIncludesTaskId =
       sortedIncompleteTaskIds.includes(activeTaskId);
-    console.log({ sortedListIncludesTaskId });
     if (activeTaskId && sortedListIncludesTaskId) return;
     initializeActiveMission();
   }, [sortedIncompleteTaskIds, todayOnly, activeTaskId]);

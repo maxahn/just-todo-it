@@ -36,15 +36,6 @@ export default function TabLayout() {
         }}
       />
       <Tabs.Screen
-        name="index"
-        options={{
-          title: "Current Task",
-          tabBarIcon: ({ color }) => (
-            <TabBarIcon name="bullseye" color={color} />
-          ),
-        }}
-      />
-      <Tabs.Screen
         name="summary/index"
         options={{
           title: "Summary",

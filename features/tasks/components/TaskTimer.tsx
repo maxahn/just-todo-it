@@ -76,7 +76,6 @@ export default function TaskTimer({ taskId, sessionId }: TaskTimerProps) {
     }
   }, [appState, subSessionsTable]);
 
-  console.log({ activeSessionId, activeTaskId });
   if (!activeSessionId || !activeTaskId)
     return <Redirect href="/tabs/(tabs)/current-task" />;
 
