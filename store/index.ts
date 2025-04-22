@@ -35,13 +35,17 @@ store.setTablesSchema({
     url: { type: "string" },
   },
   [TASK_EXTRA_TABLE_ID]: {
+    taskId: { type: "string" },
     estimatedDuration: { type: "number", default: 25 }, // in minutes
     anxietyLevel: { type: "number" },
     difficulty: { type: "number" },
+    skip: { type: "boolean", default: false },
   },
   [SESSION_TABLE_ID]: {
     id: { type: "string" },
     taskId: { type: "string" },
+    estimatedDuration: { type: "number", default: 25 }, // in minutes
+    notes: { type: "string" },
     // start: { type: "string" },
     // end: { type: "string" },
     // distractionCount: { type: "number", default: 0 },

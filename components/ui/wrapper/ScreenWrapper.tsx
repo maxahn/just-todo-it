@@ -9,6 +9,7 @@ import { VStack } from "../vstack";
 interface ScreenWrapperProps extends React.ComponentProps<typeof SafeAreaView> {
   refreshControlProps?: RefreshControlProps;
   useScrollView?: boolean;
+  containerClassName?: string;
 }
 
 export function ScrollViewScreenWrapper({
@@ -37,6 +38,7 @@ export function ScrollViewScreenWrapper({
 
 export function ScreenWrapper({
   className,
+  containerClassName,
   children,
   ...rest
 }: ScreenWrapperProps) {
@@ -45,7 +47,11 @@ export function ScreenWrapper({
       className={`flex flex-1 bg-background-100 p-3 ${className}`}
       {...rest}
     >
-      <VStack className="flex h-full justify-between px-4">{children}</VStack>
+      <VStack
+        className={`flex h-full justify-between px-4 ${containerClassName}`}
+      >
+        {children}
+      </VStack>
     </SafeAreaView>
   );
 }

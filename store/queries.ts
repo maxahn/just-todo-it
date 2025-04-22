@@ -3,6 +3,7 @@ import { store, TASK_TABLE_ID } from ".";
 
 export const QUERY_ID = {
   incompleteTasks: "incompleteTasks",
+  incompleteUnskippedTasks: "incompleteUnskippedTasks",
   activeTaskSessions: "activeSessions",
   activeTaskSubSessions: "activeSubSessions",
 };

@@ -7,7 +7,7 @@ import { HStack } from "@/components/ui/hstack";
 import { ScrollViewScreenWrapper } from "@/components/ui/wrapper/ScreenWrapper";
 import { VStack } from "@/components/ui/vstack";
 import { Redirect } from "expo-router";
-import { useSortedIncompleteTasks } from "@/store/hooks/queries/useTasks";
+import { useSortedIncompleteUnskippedTaskIds } from "@/store/hooks/queries/useTasks";
 import { SUB_SESSION_TABLE_ID } from "@/store";
 import { useRow } from "tinybase/ui-react";
 import _ from "lodash";
@@ -15,7 +15,8 @@ import _ from "lodash";
 export default function CurrentTask() {
   const [deferOffset, setDeferOffset] = useState(0);
   const [todayOnly, setTodayOnly] = useState(true);
-  const sortedIncompleteTaskIds = useSortedIncompleteTasks();
+  const sortedIncompleteUnskippedTaskIds =
+    useSortedIncompleteUnskippedTaskIds();
   const {
     isSyncing,
     handleFetchAndSyncTasks,
@@ -28,10 +29,10 @@ export default function CurrentTask() {
 
   function initializeActiveMission() {
     const isTimerActive = Boolean(activeTaskId) && Boolean(activeSessionId);
-    if (!sortedIncompleteTaskIds?.length || isTimerActive) {
+    if (!sortedIncompleteUnskippedTaskIds?.length || isTimerActive) {
       return;
     }
-    const nextActiveTaskId = sortedIncompleteTaskIds[0 + deferOffset];
+    const nextActiveTaskId = sortedIncompleteUnskippedTaskIds[0 + deferOffset];
     setActiveTaskId(nextActiveTaskId);
   }
 
@@ -43,10 +44,10 @@ export default function CurrentTask() {
 
   useEffect(() => {
     const sortedListIncludesTaskId =
-      sortedIncompleteTaskIds.includes(activeTaskId);
+      sortedIncompleteUnskippedTaskIds.includes(activeTaskId);
     if (activeTaskId && sortedListIncludesTaskId) return;
     initializeActiveMission();
-  }, [sortedIncompleteTaskIds, todayOnly, activeTaskId]);
+  }, [sortedIncompleteUnskippedTaskIds, todayOnly, activeTaskId]);
 
   const handleRefetchTasks = async () => {
     await handleFetchAndSyncTasks;

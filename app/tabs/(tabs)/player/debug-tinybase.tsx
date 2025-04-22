@@ -24,6 +24,10 @@ import { useActiveSessionsQuery } from "@/store/hooks/queries/useActiveSessionsQ
 import { useTasksAndSessions } from "@/features/tasks/hooks/useActiveMission";
 import { VStack } from "@/components/ui/vstack";
 import { X } from "lucide-react-native";
+import {
+  useSortedIncompleteUnskippedTaskIds,
+  useSortedIncompleteUnskippedTasks,
+} from "@/store/hooks/queries/useTasks";
 
 export default function Summary() {
   const {
@@ -39,6 +43,7 @@ export default function Summary() {
   const [selectedTaskId, setSelectedTaskId] = useState<string>(activeTaskId);
   const queryId = useActiveSessionsQuery(selectedTaskId);
   const store = useStore();
+  const unskippedTaskQueryId = useSortedIncompleteUnskippedTasks();
 
   const handleItemPress = (id: string) => {
     switch (activeTable) {
@@ -49,6 +54,9 @@ export default function Summary() {
         // setActiveTable(TASK_TABLE_ID);
         break;
       case TASK_TABLE_ID:
+        setSelectedTaskId(id);
+        break;
+      case unskippedTaskQueryId:
         setSelectedTaskId(id);
         break;
       default:
@@ -77,13 +85,18 @@ export default function Summary() {
 
   let sortField = undefined;
   let desc = true;
-  const isResultTable = activeTable === queryId;
+  const isResultTable =
+    activeTable === queryId || activeTable === unskippedTaskQueryId;
   switch (activeTable) {
     case SUB_SESSION_TABLE_ID:
       sortField = "start";
       desc = true;
       break;
     case TASK_TABLE_ID:
+      sortField = "order";
+      desc = false;
+      break;
+    case unskippedTaskQueryId:
       sortField = "order";
       desc = false;
       break;
@@ -186,6 +199,12 @@ export default function Summary() {
         >
           <ButtonText>Task Extra</ButtonText>
         </Button>
+        <Button
+          isDisabled={activeTable === unskippedTaskQueryId}
+          onPress={() => setActiveTable(unskippedTaskQueryId)}
+        >
+          <ButtonText>Unskipped Tasks</ButtonText>
+        </Button>
       </ScrollView>
     </ScreenWrapper>
   );
@@ -207,6 +226,7 @@ function TableList({
 } & Partial<React.ComponentProps<typeof FlatList>>) {
   const sortedRowIds = useSortedRowIds(tableId, sortField, desc) as string[];
   const sortedResultRowIds = useResultSortedRowIds(tableId, sortField, desc);
+  console.log({ tableId, sortedResultRowIds });
 
   return (
     <FlatList
@@ -240,6 +260,7 @@ function RowCard({
 } & React.ComponentProps<typeof Card>) {
   const row = useRow(tableId, rowId);
   const resultRow = useResultRow(tableId, rowId);
+  console.log({ tableId, rowId, resultRow });
   return (
     <Card className="flex flex-row flex-wrap p-1" {...rest}>
       <TouchableOpacity onPress={() => onPressRow(rowId)}>
@@ -249,7 +270,7 @@ function RowCard({
         {Object.entries(isResultTable ? resultRow : row).map(([key, value]) => (
           <Box key={key} className="p-1 border border-gray-200 pr-2">
             <Text>
-              {key}: {value}
+              {key}: {value?.toString()}
             </Text>
           </Box>
         ))}

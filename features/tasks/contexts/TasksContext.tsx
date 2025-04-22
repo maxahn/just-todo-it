@@ -100,7 +100,10 @@ export function TasksProvider(
   };
 
   const updateTaskExtra = (id: string, update: TaskExtraUpdate) => {
-    store?.setPartialRow(TASK_EXTRA_TABLE_ID, id, update);
+    store?.setPartialRow(TASK_EXTRA_TABLE_ID, id, {
+      taskId: id,
+      ...update,
+    });
   };
 
   const startSession = (taskId: string) => {
