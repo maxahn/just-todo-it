@@ -28,8 +28,8 @@ export interface TasksContextState {
   updateTask: (id: string, update: TaskUpdate) => void;
   updateTaskExtra: (id: string, update: TaskExtraUpdate) => void;
   completeTask: (id: string) => Promise<void>;
-  startSession: (taskId: string) => void;
-  startTask: (taskId: string) => void;
+  startSession: (taskId: string, estimatedDuration?: number) => void;
+  startTask: (taskId: string, estimatedDuration?: number) => void;
   cancelSession: () => void;
   finishSession: () => void;
   getIsActive: () => boolean;
@@ -112,9 +112,10 @@ export function TasksProvider(
     });
   };
 
-  const startSession = (taskId: string) => {
+  const startSession = (taskId: string, estimatedDuration?: number) => {
     const sessionId = store?.addRow(SESSION_TABLE_ID, {
       taskId,
+      estimatedDuration: estimatedDuration || 25,
     });
     if (!sessionId) throw new Error("Failed to start session");
     setActiveSessionId(sessionId);
@@ -151,9 +152,9 @@ export function TasksProvider(
     store?.delRow(SUB_SESSION_TABLE_ID, subSessionId);
   };
 
-  const startTask = (taskId: string) => {
+  const startTask = (taskId: string, estimatedDuration?: number) => {
     setActiveTaskId(taskId);
-    startSession(taskId);
+    startSession(taskId, estimatedDuration);
   };
 
   const completeTask = async (id: string) => {

@@ -61,7 +61,7 @@ export function MissionTask({ id, onDefer }: MissionTaskProps) {
   };
 
   const handleStartTask = async () => {
-    startTask(id);
+    startTask(id, taskExtra?.estimatedDuration);
   };
 
   useEffect(() => {

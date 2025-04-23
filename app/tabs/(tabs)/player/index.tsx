@@ -25,7 +25,7 @@ export default function Player() {
   return (
     <ScrollViewScreenWrapper className="flex flex-col justify-end">
       <Box>
-        <Text>Expo Build Number: 0.1.2</Text>
+        <Text>Expo Build Number: 0.1.3</Text>
         <VStack>
           <Text>Expo Config Extra: </Text>
           {Object.entries(Constants.expoConfig?.extra || {}).map(

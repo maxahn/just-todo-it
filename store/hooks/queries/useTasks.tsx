@@ -128,7 +128,6 @@ export function useCompletedTaskSessionsQueryId(filterType?: TimestampFilter) {
         select(COMPLETED_TASK_TABLE_ID, "projectId");
         select(COMPLETED_TASK_TABLE_ID, "sectionId");
         select(COMPLETED_TASK_TABLE_ID, "lastCompletedAt");
-        select(COMPLETED_TASK_TABLE_ID, "estimatedDuration");
         select(SUB_SESSION_TABLE_ID, "start");
         select(SUB_SESSION_TABLE_ID, "end");
         select(SUB_SESSION_TABLE_ID, "distractionCount");
