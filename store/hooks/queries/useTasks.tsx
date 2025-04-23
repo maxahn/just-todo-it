@@ -1,3 +1,4 @@
+import { CompletedTask } from "@/features/tasks/types";
 import {
   COMPLETED_TASK_TABLE_ID,
   SUB_SESSION_TABLE_ID,
@@ -5,18 +6,23 @@ import {
   TASK_EXTRA_TABLE_ID,
   TASK_TABLE_ID,
 } from "@/store";
-import queries, { QUERY_ID } from "@/store/queries";
+import { QUERY_ID } from "@/store/queries";
+import { isLastWeek, START_OF_WEEK_DAY } from "@/util/date/parseFromDate";
 import {
   isThisMonth,
   isThisWeek,
   isThisYear,
   isToday,
   isYesterday,
+  parseISO,
 } from "date-fns";
-import _ from "lodash";
-import { useEffect } from "react";
+import { useEffect, useMemo } from "react";
 import { GetTableCell } from "tinybase/queries";
-import { useQueries, useResultSortedRowIds } from "tinybase/ui-react";
+import {
+  useQueries,
+  useResultSortedRowIds,
+  useResultTable,
+} from "tinybase/ui-react";
 
 export function useIncompleteTasksQuery() {
   const queries = useQueries();
@@ -79,10 +85,11 @@ export function useSortedIncompleteUnskippedTasks() {
   return queryId;
 }
 
-type TimestampFilter =
+export type TimestampFilter =
   | "today"
   | "yesterday"
   | "thisWeek"
+  | "lastWeek"
   | "thisMonth"
   | "thisYear";
 
@@ -92,12 +99,14 @@ const TimestampFilterFunctions: Record<
 > = {
   today: (timestamp: string) => isToday(new Date(timestamp)),
   yesterday: (timestamp: string) => isYesterday(new Date(timestamp)),
-  thisWeek: (timestamp: string) => isThisWeek(new Date(timestamp)),
+  thisWeek: (timestamp: string) =>
+    isThisWeek(new Date(timestamp), { weekStartsOn: START_OF_WEEK_DAY }),
+  lastWeek: (timestamp: string) => isLastWeek(new Date(timestamp)),
   thisMonth: (timestamp: string) => isThisMonth(new Date(timestamp)),
   thisYear: (timestamp: string) => isThisYear(new Date(timestamp)),
 };
 
-export function useTasksCompletedQuery(filterType?: TimestampFilter) {
+export function useCompletedTaskSessionsQueryId(filterType?: TimestampFilter) {
   const queries = useQueries();
   const queryId = `${QUERY_ID.tasksCompleted}_${filterType || ""}`;
 
@@ -127,6 +136,20 @@ export function useTasksCompletedQuery(filterType?: TimestampFilter) {
         select(SUB_SESSION_TABLE_ID, "sessionId");
         select(SESSION_TABLE_ID, "taskId");
         select(SESSION_TABLE_ID, "estimatedDuration");
+        select(SESSION_TABLE_ID, "notes");
+        select((getTableCell: GetTableCell) => {
+          const start = getTableCell(SUB_SESSION_TABLE_ID, "start") as
+            | string
+            | undefined;
+          const end = getTableCell(SUB_SESSION_TABLE_ID, "end") as
+            | string
+            | undefined;
+          if (!end || !start) return 0;
+          const msDuration =
+            parseISO(end).getTime() - parseISO(start).getTime();
+          return Math.floor(msDuration / 1000);
+        }).as("durationInSeconds");
+
         if (filterType && TimestampFilterFunctions[filterType]) {
           where((getTableCell: GetTableCell) => {
             const lastCompletedAt = getTableCell(
@@ -148,10 +171,29 @@ export function useTasksCompletedQuery(filterType?: TimestampFilter) {
   return queryId;
 }
 
-export const useCompletedTasksQuery = (filterType?: TimestampFilter) => {
-  const queryId = useTasksCompletedQuery(filterType);
-  const sortedTaskIds = useResultSortedRowIds(queryId, "completedAt", false);
-  return sortedTaskIds;
+// Grouping by sessionId & aggregating durationInSeconds
+// Table: <taskId, CompletedTask>
+export const useCompletedTasksTable = (filterType?: TimestampFilter) => {
+  const queryId = useCompletedTaskSessionsQueryId(filterType);
+  const completedTaskSessionsTable = useResultTable(queryId);
+  return useMemo(() => {
+    const completedTasks: Record<string, CompletedTask> = {};
+    for (const id in completedTaskSessionsTable) {
+      const taskSession = completedTaskSessionsTable[id] as CompletedTask;
+      const existingSession = completedTasks[taskSession.taskId];
+      if (existingSession) {
+        const existingDuration = existingSession.durationInSeconds || 0;
+        completedTasks[taskSession.taskId] = {
+          ...taskSession,
+          durationInSeconds:
+            existingDuration + (taskSession.durationInSeconds || 0),
+        };
+        continue;
+      }
+      completedTasks[taskSession.taskId] = taskSession;
+    }
+    return completedTasks;
+  }, [filterType]);
 };
 
 export const useSortedIncompleteTaskIds = () => {

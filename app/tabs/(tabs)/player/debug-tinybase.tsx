@@ -27,7 +27,7 @@ import { VStack } from "@/components/ui/vstack";
 import { X } from "lucide-react-native";
 import {
   useSortedIncompleteUnskippedTasks,
-  useTasksCompletedQuery,
+  useCompletedTaskSessionsQueryId,
 } from "@/store/hooks/queries/useTasks";
 
 export default function Summary() {
@@ -45,7 +45,7 @@ export default function Summary() {
   const queryId = useActiveSessionsQuery(selectedTaskId);
   const store = useStore();
   const unskippedTaskQueryId = useSortedIncompleteUnskippedTasks();
-  const completedTaskQueryId = useTasksCompletedQuery("today");
+  const completedTaskQueryId = useCompletedTaskSessionsQueryId("yesterday");
 
   const handleItemPress = (id: string) => {
     switch (activeTable) {
@@ -239,7 +239,7 @@ function TableList({
 } & Partial<React.ComponentProps<typeof FlatList>>) {
   const sortedRowIds = useSortedRowIds(tableId, sortField, desc) as string[];
   const sortedResultRowIds = useResultSortedRowIds(tableId, sortField, desc);
-  console.log({ tableId, sortedResultRowIds });
+  console.log({ tableId, sortedResultRowIdsLength: sortedResultRowIds.length });
 
   const isResultTable = sortedResultRowIds.length > 0;
 
@@ -275,7 +275,6 @@ function RowCard({
 } & React.ComponentProps<typeof Card>) {
   const row = useRow(tableId, rowId);
   const resultRow = useResultRow(tableId, rowId);
-  console.log({ tableId, rowId, resultRow });
   return (
     <Card className="flex flex-row flex-wrap p-1" {...rest}>
       <TouchableOpacity onPress={() => onPressRow(rowId)}>

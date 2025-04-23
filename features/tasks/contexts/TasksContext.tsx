@@ -12,7 +12,6 @@ import { useCompleteTaskMutation } from "../hooks/useCompleteTaskMutation";
 import type {
   CompletedTask,
   Task,
-  TaskExtra,
   TaskExtraUpdate,
   TaskUpdate,
 } from "../types";
@@ -164,7 +163,7 @@ export function TasksProvider(
       finishSession();
     }
     const taskExtra = store?.getRow(TASK_EXTRA_TABLE_ID, id);
-    const task: CompletedTask = {
+    const task: Partial<CompletedTask> = {
       ...(store?.getRow(TASK_TABLE_ID, id) as Task),
       lastCompletedAt: new Date().toISOString(),
     };
