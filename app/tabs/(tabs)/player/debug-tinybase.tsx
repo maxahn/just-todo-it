@@ -2,6 +2,7 @@ import { Card } from "@/components/ui/card";
 import { Text } from "@/components/ui/text";
 import { ScreenWrapper } from "@/components/ui/wrapper/ScreenWrapper";
 import {
+  COMPLETED_TASK_TABLE_ID,
   SESSION_TABLE_ID,
   SUB_SESSION_TABLE_ID,
   TASK_EXTRA_TABLE_ID,
@@ -25,8 +26,8 @@ import { useTasksAndSessions } from "@/features/tasks/hooks/useActiveMission";
 import { VStack } from "@/components/ui/vstack";
 import { X } from "lucide-react-native";
 import {
-  useSortedIncompleteUnskippedTaskIds,
   useSortedIncompleteUnskippedTasks,
+  useTasksCompletedQuery,
 } from "@/store/hooks/queries/useTasks";
 
 export default function Summary() {
@@ -44,6 +45,7 @@ export default function Summary() {
   const queryId = useActiveSessionsQuery(selectedTaskId);
   const store = useStore();
   const unskippedTaskQueryId = useSortedIncompleteUnskippedTasks();
+  const completedTaskQueryId = useTasksCompletedQuery("today");
 
   const handleItemPress = (id: string) => {
     switch (activeTable) {
@@ -56,8 +58,12 @@ export default function Summary() {
       case TASK_TABLE_ID:
         setSelectedTaskId(id);
         break;
-      case unskippedTaskQueryId:
+      case COMPLETED_TASK_TABLE_ID:
         setSelectedTaskId(id);
+        break;
+      case unskippedTaskQueryId:
+        break;
+      case completedTaskQueryId:
         break;
       default:
         break;
@@ -78,6 +84,9 @@ export default function Summary() {
       case TASK_EXTRA_TABLE_ID:
         store?.delTable(TASK_EXTRA_TABLE_ID);
         break;
+      case COMPLETED_TASK_TABLE_ID:
+        store?.delTable(COMPLETED_TASK_TABLE_ID);
+        break;
       default:
         break;
     }
@@ -85,8 +94,6 @@ export default function Summary() {
 
   let sortField = undefined;
   let desc = true;
-  const isResultTable =
-    activeTable === queryId || activeTable === unskippedTaskQueryId;
   switch (activeTable) {
     case SUB_SESSION_TABLE_ID:
       sortField = "start";
@@ -98,6 +105,10 @@ export default function Summary() {
       break;
     case unskippedTaskQueryId:
       sortField = "order";
+      desc = false;
+      break;
+    case completedTaskQueryId:
+      sortField = "lastCompletedAt";
       desc = false;
       break;
     default:
@@ -119,13 +130,11 @@ export default function Summary() {
         </Button>
       </HStack>
       {activeTable ? (
-        // <Box className="flex-1">
         <TableList
           tableId={activeTable}
           onItemPress={handleItemPress}
           sortField={sortField}
           desc={desc}
-          isResultTable={isResultTable}
         />
       ) : (
         <VStack className="gap-1">
@@ -205,6 +214,12 @@ export default function Summary() {
         >
           <ButtonText>Unskipped Tasks</ButtonText>
         </Button>
+        <Button
+          isDisabled={activeTable === completedTaskQueryId}
+          onPress={() => setActiveTable(completedTaskQueryId)}
+        >
+          <ButtonText>Completed Tasks</ButtonText>
+        </Button>
       </ScrollView>
     </ScreenWrapper>
   );
@@ -215,18 +230,18 @@ function TableList({
   onItemPress,
   sortField,
   desc,
-  isResultTable = false,
   ...rest
 }: {
   tableId: string;
   onItemPress: (id: string) => void;
   sortField?: string;
   desc?: boolean;
-  isResultTable?: boolean;
 } & Partial<React.ComponentProps<typeof FlatList>>) {
   const sortedRowIds = useSortedRowIds(tableId, sortField, desc) as string[];
   const sortedResultRowIds = useResultSortedRowIds(tableId, sortField, desc);
   console.log({ tableId, sortedResultRowIds });
+
+  const isResultTable = sortedResultRowIds.length > 0;
 
   return (
     <FlatList

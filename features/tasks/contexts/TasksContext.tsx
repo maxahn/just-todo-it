@@ -2,13 +2,20 @@ import { syncTasksFromApi } from "@/store/util/syncTasksFromApi";
 import { createContext, ProviderProps, useEffect, useState } from "react";
 import { useStore, useValue } from "tinybase/ui-react";
 import {
+  COMPLETED_TASK_TABLE_ID,
   SESSION_TABLE_ID,
   SUB_SESSION_TABLE_ID,
   TASK_EXTRA_TABLE_ID,
   TASK_TABLE_ID,
 } from "@/store";
 import { useCompleteTaskMutation } from "../hooks/useCompleteTaskMutation";
-import type { TaskExtraUpdate, TaskUpdate } from "../types";
+import type {
+  CompletedTask,
+  Task,
+  TaskExtra,
+  TaskExtraUpdate,
+  TaskUpdate,
+} from "../types";
 import { useDeleteSubSessions } from "@/store/hooks/queries/useActiveSessionsQuery";
 
 export interface TasksContextState {
@@ -127,9 +134,10 @@ export function TasksProvider(
 
   const finishSession = () => {
     if (!activeSessionId) throw new Error("No active session");
-    if (!activeSubSessionId) throw new Error("No active sub session");
     setActiveSessionId("");
-    finishSubSession();
+    if (activeSubSessionId) {
+      finishSubSession();
+    }
   };
 
   const finishSubSession = () => {
@@ -155,8 +163,25 @@ export function TasksProvider(
     if (activeSessionId) {
       finishSession();
     }
+    const taskExtra = store?.getRow(TASK_EXTRA_TABLE_ID, id);
+    const task: CompletedTask = {
+      ...(store?.getRow(TASK_TABLE_ID, id) as Task),
+      lastCompletedAt: new Date().toISOString(),
+    };
+    if (taskExtra?.estimatedDuration) {
+      task.estimatedDuration = taskExtra.estimatedDuration as number;
+    }
+    const addCompletedTaskPromise = store?.setPartialRow(
+      COMPLETED_TASK_TABLE_ID,
+      id,
+      task,
+    );
     setActiveTaskId("");
-    await Promise.all([completeTaskPromise, updateTaskPromise]);
+    await Promise.all([
+      completeTaskPromise,
+      updateTaskPromise,
+      addCompletedTaskPromise,
+    ]);
   };
 
   const cancelSession = () => {

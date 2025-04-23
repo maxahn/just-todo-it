@@ -67,6 +67,11 @@ export type TaskExtra = {
   skip?: boolean;
 };
 
+export type CompletedTask = Task & {
+  lastCompletedAt: string;
+  estimatedDuration?: number;
+};
+
 export type TaskExtraUpdate = Partial<TaskExtra>;
 
 export type TaskUpdate = Partial<Omit<Task, "id" | "createdAt">>;

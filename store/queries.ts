@@ -6,6 +6,7 @@ export const QUERY_ID = {
   incompleteUnskippedTasks: "incompleteUnskippedTasks",
   activeTaskSessions: "activeSessions",
   activeTaskSubSessions: "activeSubSessions",
+  tasksCompleted: "tasksCompleted",
 };
 
 export const queries = createQueries(store).setQueryDefinition(
