@@ -28,7 +28,10 @@ export interface TasksContextState {
   updateTask: (id: string, update: TaskUpdate) => void;
   updateTaskExtra: (id: string, update: TaskExtraUpdate) => void;
   completeTask: (id: string) => Promise<void>;
-  startSession: (taskId: string, estimatedDuration?: number) => void;
+  startSession: (
+    taskId: string,
+    estimatedDuration?: number,
+  ) => [string, string];
   startTask: (taskId: string, estimatedDuration?: number) => void;
   cancelSession: () => void;
   finishSession: () => void;
@@ -51,7 +54,7 @@ export const TasksContext = createContext<TasksContextState>({
   setActiveSubSessionId: () => {},
   updateTask: () => {},
   updateTaskExtra: () => {},
-  startSession: () => {},
+  startSession: () => ["", ""],
   startTask: () => {},
   completeTask: async () => {},
   cancelSession: () => {},
@@ -119,9 +122,10 @@ export function TasksProvider(
     });
     if (!sessionId) throw new Error("Failed to start session");
     setActiveSessionId(sessionId);
-    startSubSession(sessionId);
-    return sessionId;
+    const subSessionId = startSubSession(sessionId);
+    return [sessionId, subSessionId];
   };
+
   const startSubSession = (sessionId: string) => {
     const subSessionId = store?.addRow(SUB_SESSION_TABLE_ID, {
       sessionId,
@@ -132,19 +136,23 @@ export function TasksProvider(
     return subSessionId;
   };
 
-  const finishSession = () => {
-    if (!activeSessionId) throw new Error("No active session");
+  const finishSession = (subSessionId?: string) => {
     setActiveSessionId("");
-    if (activeSubSessionId) {
-      finishSubSession();
+    if (subSessionId || activeSubSessionId) {
+      finishSubSession(subSessionId || activeSubSessionId);
     }
   };
 
-  const finishSubSession = () => {
-    if (!activeSubSessionId) throw new Error("No active sub session");
-    store?.setPartialRow(SUB_SESSION_TABLE_ID, activeSubSessionId, {
-      end: new Date().toISOString(),
-    });
+  const finishSubSession = (subSessionId?: string) => {
+    if (!activeSubSessionId && !subSessionId)
+      throw new Error("No active sub session");
+    store?.setPartialRow(
+      SUB_SESSION_TABLE_ID,
+      subSessionId || activeSubSessionId,
+      {
+        end: new Date().toISOString(),
+      },
+    );
     setActiveSubSessionId("");
   };
 
@@ -160,8 +168,12 @@ export function TasksProvider(
   const completeTask = async (id: string) => {
     const completeTaskPromise = completeTaskAsync({ id });
     const updateTaskPromise = updateTask(id, { isCompleted: true });
+    // TODO: create sub session on completeTask even if no session is active
     if (activeSessionId) {
       finishSession();
+    } else {
+      const [, subSessionId] = await startSession(id);
+      finishSession(subSessionId);
     }
     const taskExtra = store?.getRow(TASK_EXTRA_TABLE_ID, id);
     const task: Partial<CompletedTask> = {

@@ -175,24 +175,24 @@ export function useCompletedTaskSessionsQueryId(filterType?: TimestampFilter) {
 export const useCompletedTasksTable = (filterType?: TimestampFilter) => {
   const queryId = useCompletedTaskSessionsQueryId(filterType);
   const completedTaskSessionsTable = useResultTable(queryId);
-  return useMemo(() => {
-    const completedTasks: Record<string, CompletedTask> = {};
-    for (const id in completedTaskSessionsTable) {
-      const taskSession = completedTaskSessionsTable[id] as CompletedTask;
-      const existingSession = completedTasks[taskSession.taskId];
-      if (existingSession) {
-        const existingDuration = existingSession.durationInSeconds || 0;
-        completedTasks[taskSession.taskId] = {
-          ...taskSession,
-          durationInSeconds:
-            existingDuration + (taskSession.durationInSeconds || 0),
-        };
-        continue;
-      }
-      completedTasks[taskSession.taskId] = taskSession;
+  // return useMemo(() => {
+  const completedTasks: Record<string, CompletedTask> = {};
+  for (const id in completedTaskSessionsTable) {
+    const taskSession = completedTaskSessionsTable[id] as CompletedTask;
+    const existingSession = completedTasks[taskSession.taskId];
+    if (existingSession) {
+      const existingDuration = existingSession.durationInSeconds || 0;
+      completedTasks[taskSession.taskId] = {
+        ...taskSession,
+        durationInSeconds:
+          existingDuration + (taskSession.durationInSeconds || 0),
+      };
+      continue;
     }
-    return completedTasks;
-  }, [filterType]);
+    completedTasks[taskSession.taskId] = taskSession;
+  }
+  return completedTasks;
+  // }, [filterType]);
 };
 
 export const useSortedIncompleteTaskIds = () => {
