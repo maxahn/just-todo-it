@@ -17,6 +17,7 @@ store.setValuesSchema({
 
 store.setTablesSchema({
   [TASK_TABLE_ID]: {
+    id: { type: "string" },
     createdAt: { type: "string" },
     isCompleted: { type: "boolean" },
     content: { type: "string" },
@@ -35,6 +36,7 @@ store.setTablesSchema({
     url: { type: "string" },
   },
   [COMPLETED_TASK_TABLE_ID]: {
+    id: { type: "string" },
     createdAt: { type: "string" },
     content: { type: "string" },
     description: { type: "string" },

@@ -16,7 +16,7 @@ import {
   isYesterday,
   parseISO,
 } from "date-fns";
-import { useEffect, useMemo } from "react";
+import { useEffect } from "react";
 import { GetTableCell } from "tinybase/queries";
 import {
   useQueries,
@@ -50,7 +50,7 @@ export function useIncompleteTasksQuery() {
       select("assignerId");
       where("isCompleted", false);
     });
-  }, [queries, queryId]);
+  }, [queries]);
 
   return queryId;
 }
@@ -67,11 +67,10 @@ export function useSortedIncompleteUnskippedTasks() {
       queryId,
       TASK_TABLE_ID,
       ({ select, where, join }) => {
-        select(TASK_EXTRA_TABLE_ID, "skip");
-        select(TASK_EXTRA_TABLE_ID, "taskId");
         select(TASK_TABLE_ID, "id");
         select(TASK_TABLE_ID, "order");
         select(TASK_TABLE_ID, "isCompleted");
+        select(TASK_EXTRA_TABLE_ID, "skip");
         join(TASK_EXTRA_TABLE_ID, "id");
         where(TASK_TABLE_ID, "isCompleted", false);
         where((getTableCell: GetTableCell) => {
@@ -80,7 +79,7 @@ export function useSortedIncompleteUnskippedTasks() {
         });
       },
     );
-  }, [queries, queryId]);
+  }, [queries]);
 
   return queryId;
 }

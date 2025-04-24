@@ -45,6 +45,11 @@ export default function CurrentTask() {
   useEffect(() => {
     const sortedListIncludesTaskId =
       sortedIncompleteUnskippedTaskIds.includes(activeTaskId);
+    // console.log({
+    //   sortedListIncludesTaskId,
+    //   activeTaskId,
+    //   sortedIncompleteUnskippedTaskIds,
+    // });
     if (activeTaskId && sortedListIncludesTaskId) return;
     initializeActiveMission();
   }, [sortedIncompleteUnskippedTaskIds, todayOnly, activeTaskId]);

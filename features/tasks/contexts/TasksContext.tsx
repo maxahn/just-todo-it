@@ -28,10 +28,7 @@ export interface TasksContextState {
   updateTask: (id: string, update: TaskUpdate) => void;
   updateTaskExtra: (id: string, update: TaskExtraUpdate) => void;
   completeTask: (id: string) => Promise<void>;
-  startSession: (
-    taskId: string,
-    estimatedDuration?: number,
-  ) => [string, string];
+  startSession: (taskId: string, estimatedDuration?: number) => string[];
   startTask: (taskId: string, estimatedDuration?: number) => void;
   cancelSession: () => void;
   finishSession: () => void;
