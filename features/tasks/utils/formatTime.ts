@@ -14,7 +14,10 @@ export function secondsToFormattedTime(seconds: number) {
 export function secondsToHoursMinutes(seconds: number) {
   const hours = Math.floor(seconds / 3600);
   const minutes = Math.floor((seconds % 3600) / 60);
-  return `${hours ? `${hours}h` : ""}${minutes ? ` ${minutes}m` : ""}`;
+  const sec = seconds % 60;
+  return `${hours ? `${hours}h` : ""}${minutes ? ` ${minutes}m` : ""}${
+    sec ? ` ${sec}s` : ""
+  }`;
 }
 
 export const formatSession = (session: [string, string | null]) => {

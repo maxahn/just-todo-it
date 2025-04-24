@@ -71,8 +71,6 @@ export default function Summary() {
     return sum;
   }, [completedTasksTable]);
 
-  console.log({ totalTimeSpent });
-
   return (
     <ScreenWrapper containerClassName="gap-4 pt-6 justify-start">
       <HStack className="justify-between items-end">
@@ -103,7 +101,7 @@ export default function Summary() {
           className="flex-1"
         />
         <StatCard
-          value={secondsToHoursMinutes(totalTimeSpent)}
+          value={secondsToHoursMinutes(totalTimeSpent) || "0m"}
           description="Time Spent"
           Icon={<AntDesign name="clockcircle" size={24} color="white" />}
           className="flex-1"

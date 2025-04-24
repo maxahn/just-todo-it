@@ -26,6 +26,7 @@ export function CompletedTaskCard({
   } = task;
   const beatEstimation =
     durationInSeconds && durationInSeconds < estimatedDuration * 60;
+
   return (
     <Card className={`p-4 gap-2 ${className}`} {...props}>
       <HStack className="justify-between">
@@ -37,9 +38,8 @@ export function CompletedTaskCard({
         <HStack className="gap-2 items-center">
           <AntDesign name="clockcircle" size={16} color="white" />
           <Text className={beatEstimation ? "text-success-500" : ""}>
-            {secondsToHoursMinutes(durationInSeconds || 0) ||
-              `${durationInSeconds}s`}{" "}
-            / {estimatedDuration || 0}m
+            {secondsToHoursMinutes(durationInSeconds || 0) || "0s"} /{" "}
+            {estimatedDuration || 0}m
           </Text>
         </HStack>
       ) : null}
