@@ -10,6 +10,7 @@ import { getHumanReadableDate } from "@/util/date/parseFromDate";
 import { useRow } from "tinybase/ui-react";
 import { TASK_EXTRA_TABLE_ID, TASK_TABLE_ID } from "@/store";
 import { useTasksAndSessions } from "../hooks/useActiveMission";
+import { isToday } from "@/util/date/isToday";
 
 interface TaskCardProps extends ICardProps {
   id: string;
@@ -32,14 +33,15 @@ export function TaskCard({
     });
   };
   const isSkipped = Boolean(taskExtra.skip);
+  const isDueToday = isToday(task.dueDate || "");
 
   return (
     <Card
       key={id}
-      className={`border-l-4 border-${getPriorityColor(task.priority)} ${isSkipped ? "opacity-50" : ""} ${className}`}
+      className={`pl-0 border-l border-${getPriorityColor(task.priority)} ${isDueToday ? "bg-info-100" : ""} ${isSkipped ? "opacity-50" : ""} ${className}`}
       {...rest}
     >
-      <HStack className="flex justify-between border-l-4">
+      <HStack className={`flex justify-between`}>
         <VStack className="flex-1">
           <Text className=" text-2xl font-bold">{task.content}</Text>
           <Text>{task.dueDate ? getHumanReadableDate(task.dueDate) : ""}</Text>
