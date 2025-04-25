@@ -62,6 +62,7 @@ store.setTablesSchema({
     anxietyLevel: { type: "number" },
     difficulty: { type: "number" },
     skip: { type: "boolean", default: false },
+    promptNotes: { type: "boolean" },
   },
   [SESSION_TABLE_ID]: {
     taskId: { type: "string" },
