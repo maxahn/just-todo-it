@@ -1,8 +1,16 @@
-# Welcome to your Expo app 👋
+# Just TODO It (Placeholder name? Idk I like it)
 
-This is an [Expo](https://expo.dev) project created with [`create-expo-app`](https://www.npmjs.com/package/create-expo-app).
+This is a mobile app that pulls tasks from the Todist API, sorts them based on priority and due date and presents one task a time for the user to complete. The idea is to not think, just do. When you want to start a task, you estimate how long you think the task will take, start the task and try and beat the time. There are a bunch of future features I'd like to implement which are outlined below but for now, this is the basic functionality of the app.
 
-## Get started
+![](https://i.imgur.com/ZN3n3m0.jpeg)
+![](https://i.imgur.com/yql76T9.jpeg)
+![](https://i.imgur.com/Z4Stniq.jpeg)
+![](https://i.imgur.com/aQaSK5R.jpeg)
+![](https://i.imgur.com/rbKeNOO.jpeg)
+
+## Development Get started
+
+### Setup
 
 1. Install dependencies
 
@@ -10,41 +18,78 @@ This is an [Expo](https://expo.dev) project created with [`create-expo-app`](htt
    npm install
    ```
 
-2. Start the app
+2. You will need a dev client build since Expo Go will not work for this app. You can build it using EAS with the following commands:
+
+#### IOS Simulator Build
+
+```bash
+   npx eas build --profile development --platform ios
+```
+
+#### Android
+
+```bash
+   npx eas build --profile development --platform android
+```
+
+Please refer to the `eas.json` file for additional build profiles.
+
+3. Start the app
 
    ```bash
     npx expo start
    ```
 
-In the output, you'll find options to open the app in a
+4. Follow instructions printed out on dev server to connect to the dev client build and start development.
 
-- [development build](https://docs.expo.dev/develop/development-builds/introduction/)
-- [Android emulator](https://docs.expo.dev/workflow/android-studio-emulator/)
-- [iOS simulator](https://docs.expo.dev/workflow/ios-simulator/)
-- [Expo Go](https://expo.dev/go), a limited sandbox for trying out app development with Expo
+## Stack and Tools
 
-You can start developing by editing the files inside the **app** directory. This project uses [file-based routing](https://docs.expo.dev/router/introduction).
+- Expo 52
+- Typescript
+- Gluestack UI (UI library and framework built on Nativewind)
+- Tinybase and SQL Lite
+  - Using this so the app can work offline. It's still a work in progress since the sync layer is still one way (pulling TODOist tasks and populating DB but not syncing changes back) but it's nice to have all the data locally stored (besides TODOist tasks).
+- React hook query
 
-## Get a fresh project
+## Implemented Features
 
-When you're ready, run:
+- Pulls tasks from Todoist account, sorts them and presents them to the user one at a time to be completed
+- Task list:
+  - User can view list of sorted tasks
+  - You can mark tasks to be skipped
+- Current task
+  - Presents one task for the user to work on
+  - Complete task right away without starting timer
+  - Increase or decrease estimated time for task
+  - Starting task moves user to the timer screen, starting a Session and Sub-session
+- Task Timer
+  - Pausing the timer will end the Sub-session
+  - Starting will start a new Sub-session
+  - Sessions can be viewed in list under the timer
+  - Cancelling the session will wipe the current session and sub-sessions associated with that subsession and return the user to the previous current task screen
+  - Completing the task will send a post request to the TODOist API to mark the task as complete, as well as copy the task over to the CompletedTasks table in the local database. It will also finish the current sub-session and session.
+- Summary
+  - Queries tasks that were completed between preset time ranges and sums total time worked on tasks
+  - Shows tasks completed and comparison between estimated time and actual time
+  - Presets include _Yesterday_, _Today_, _This Week_, _This Month_
+    Player
+- Able to update TODOist API Key
+- View entries in the Tinybase database (For developer)
 
-```bash
-npm run reset-project
-```
+## Future Features
 
-This command will move the starter code to the **app-example** directory and create a blank **app** directory where you can start developing.
-
-## Learn more
-
-To learn more about developing your project with Expo, look at the following resources:
-
-- [Expo documentation](https://docs.expo.dev/): Learn fundamentals, or go into advanced topics with our [guides](https://docs.expo.dev/guides).
-- [Learn Expo tutorial](https://docs.expo.dev/tutorial/introduction/): Follow a step-by-step tutorial where you'll create a project that runs on Android, iOS, and the web.
-
-## Join the community
-
-Join our community of developers creating universal apps.
-
-- [Expo on GitHub](https://github.com/expo/expo): View our open source platform and contribute.
-- [Discord community](https://chat.expo.dev): Chat with Expo users and ask questions.
+- [ ] Allow taking notes while working on tasks
+  - Then be able to view notes when looking at the day's summary
+  - or if it's a re-occuring task, present the notes of previousl iterations of the task
+- [ ] Handle subtasks
+- [ ] For re-occuring tasks, be presented with previous completion times. Maybe an average of the last N number of times.
+- [ ] Support of other Todo app API's
+- [ ] Proper TODOist Oauth login
+- [ ] Ability to add your own tasks so it can operate as a stand-alone app
+- [ ] Gamification
+  - [ ] Exp calculate for each task dependant on estimated duration/actual duration
+  - [ ] Level up and compete on leaderboard
+  - [ ] Level resets at the end of the week
+  - [ ] Achievements
+- [ ] Tag system
+  - I want to be able to view and filter tasks and estimation successes by type of task
