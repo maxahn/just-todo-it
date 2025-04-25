@@ -2,13 +2,19 @@ import { syncTasksFromApi } from "@/store/util/syncTasksFromApi";
 import { createContext, ProviderProps, useEffect, useState } from "react";
 import { useStore, useValue } from "tinybase/ui-react";
 import {
+  COMPLETED_TASK_TABLE_ID,
   SESSION_TABLE_ID,
   SUB_SESSION_TABLE_ID,
   TASK_EXTRA_TABLE_ID,
   TASK_TABLE_ID,
 } from "@/store";
 import { useCompleteTaskMutation } from "../hooks/useCompleteTaskMutation";
-import type { TaskExtraUpdate, TaskUpdate } from "../types";
+import type {
+  CompletedTask,
+  Task,
+  TaskExtraUpdate,
+  TaskUpdate,
+} from "../types";
 import { useDeleteSubSessions } from "@/store/hooks/queries/useActiveSessionsQuery";
 
 export interface TasksContextState {
@@ -19,18 +25,17 @@ export interface TasksContextState {
   setActiveTaskId: (id: string) => void;
   setActiveSessionId: (id: string) => void;
   setActiveSubSessionId: (id: string) => void;
-  setIsTimerPaused: (paused: boolean) => void;
   updateTask: (id: string, update: TaskUpdate) => void;
   updateTaskExtra: (id: string, update: TaskExtraUpdate) => void;
   completeTask: (id: string) => Promise<void>;
-  startSession: (taskId: string) => void;
-  startTask: (taskId: string) => void;
+  startSession: (taskId: string, estimatedDuration?: number) => string[];
+  startTask: (taskId: string, estimatedDuration?: number) => void;
   cancelSession: () => void;
   finishSession: () => void;
   getIsActive: () => boolean;
   toggleIsTaskPaused: () => void;
   getTotalSessionsDuration: () => number;
-  removeSession: (index: number) => void;
+  removeSubSession: (id: string) => void;
   handleFetchAndSyncTasks: () => Promise<void>;
   isSyncing: boolean;
   isCompleting: boolean;
@@ -44,10 +49,9 @@ export const TasksContext = createContext<TasksContextState>({
   setActiveTaskId: () => {},
   setActiveSessionId: () => {},
   setActiveSubSessionId: () => {},
-  setIsTimerPaused: () => {},
   updateTask: () => {},
   updateTaskExtra: () => {},
-  startSession: () => {},
+  startSession: () => ["", ""],
   startTask: () => {},
   completeTask: async () => {},
   cancelSession: () => {},
@@ -55,7 +59,7 @@ export const TasksContext = createContext<TasksContextState>({
   getIsActive: () => false,
   toggleIsTaskPaused: () => {},
   getTotalSessionsDuration: () => 0,
-  removeSession: () => {},
+  removeSubSession: () => {},
   handleFetchAndSyncTasks: async () => {},
   isSyncing: false,
   isCompleting: false,
@@ -67,12 +71,14 @@ export function TasksProvider(
   const [isSyncing, setIsSyncing] = useState(false);
   const store = useStore();
   const activeTaskId = useValue("activeTaskId") as string;
-  const isTimerPaused = useValue("isTimerPaused") as boolean;
+  // const isTimerPaused = useValue("isTimerPaused") as boolean;
   const activeSessionId = useValue("activeSessionId") as string;
   const activeSubSessionId = useValue("activeSubSessionId") as string;
   const { mutateAsync: completeTaskAsync, isPending: isCompleting } =
     useCompleteTaskMutation();
   const deleteSubSessions = useDeleteSubSessions(activeSessionId);
+
+  const isTimerPaused = Boolean(activeSessionId) && !activeSubSessionId;
   // const tasksTable = useTable(TASK_TABLE_ID)
 
   const handleFetchAndSyncTasks = async () => {
@@ -91,10 +97,6 @@ export function TasksProvider(
     store?.setValue("activeSessionId", id);
   };
 
-  const setIsTimerPaused = (paused: boolean) => {
-    store?.setValue("isTimerPaused", paused);
-  };
-
   const setActiveSubSessionId = (id: string) => {
     store?.setValue("activeSubSessionId", id);
   };
@@ -104,18 +106,23 @@ export function TasksProvider(
   };
 
   const updateTaskExtra = (id: string, update: TaskExtraUpdate) => {
-    store?.setPartialRow(TASK_EXTRA_TABLE_ID, id, update);
+    store?.setPartialRow(TASK_EXTRA_TABLE_ID, id, {
+      taskId: id,
+      ...update,
+    });
   };
 
-  const startSession = (taskId: string) => {
+  const startSession = (taskId: string, estimatedDuration?: number) => {
     const sessionId = store?.addRow(SESSION_TABLE_ID, {
       taskId,
+      estimatedDuration: estimatedDuration || 25,
     });
     if (!sessionId) throw new Error("Failed to start session");
     setActiveSessionId(sessionId);
-    startSubSession(sessionId);
-    return sessionId;
+    const subSessionId = startSubSession(sessionId);
+    return [sessionId, subSessionId];
   };
+
   const startSubSession = (sessionId: string) => {
     const subSessionId = store?.addRow(SUB_SESSION_TABLE_ID, {
       sessionId,
@@ -126,36 +133,64 @@ export function TasksProvider(
     return subSessionId;
   };
 
-  const finishSession = () => {
-    if (!activeSessionId) throw new Error("No active session");
-    if (!activeSubSessionId) throw new Error("No active sub session");
+  const finishSession = (subSessionId?: string) => {
     setActiveSessionId("");
-    finishSubSession();
+    if (subSessionId || activeSubSessionId) {
+      finishSubSession(subSessionId || activeSubSessionId);
+    }
   };
 
-  const finishSubSession = () => {
-    if (!activeSubSessionId) throw new Error("No active sub session");
-    store?.setPartialRow(SUB_SESSION_TABLE_ID, activeSubSessionId, {
-      end: new Date().toISOString(),
-    });
+  const finishSubSession = (subSessionId?: string) => {
+    if (!activeSubSessionId && !subSessionId)
+      throw new Error("No active sub session");
+    store?.setPartialRow(
+      SUB_SESSION_TABLE_ID,
+      subSessionId || activeSubSessionId,
+      {
+        end: new Date().toISOString(),
+      },
+    );
     setActiveSubSessionId("");
   };
 
-  const startTask = (taskId: string) => {
+  const removeSubSession = (subSessionId: string) => {
+    store?.delRow(SUB_SESSION_TABLE_ID, subSessionId);
+  };
+
+  const startTask = (taskId: string, estimatedDuration?: number) => {
     setActiveTaskId(taskId);
-    startSession(taskId);
+    startSession(taskId, estimatedDuration);
   };
 
   const completeTask = async (id: string) => {
-    if (!id) throw new Error("No active task");
-    // TODO: refactor to sync local and remote data
     const completeTaskPromise = completeTaskAsync({ id });
     const updateTaskPromise = updateTask(id, { isCompleted: true });
+    // TODO: create sub session on completeTask even if no session is active
     if (activeSessionId) {
       finishSession();
+    } else {
+      const [, subSessionId] = await startSession(id);
+      finishSession(subSessionId);
     }
+    const taskExtra = store?.getRow(TASK_EXTRA_TABLE_ID, id);
+    const task: Partial<CompletedTask> = {
+      ...(store?.getRow(TASK_TABLE_ID, id) as Task),
+      lastCompletedAt: new Date().toISOString(),
+    };
+    if (taskExtra?.estimatedDuration) {
+      task.estimatedDuration = taskExtra.estimatedDuration as number;
+    }
+    const addCompletedTaskPromise = store?.setPartialRow(
+      COMPLETED_TASK_TABLE_ID,
+      id,
+      task,
+    );
     setActiveTaskId("");
-    await Promise.all([completeTaskPromise, updateTaskPromise]);
+    await Promise.all([
+      completeTaskPromise,
+      updateTaskPromise,
+      addCompletedTaskPromise,
+    ]);
   };
 
   const cancelSession = () => {
@@ -169,20 +204,16 @@ export function TasksProvider(
   const toggleIsTaskPaused = () => {
     if (!activeSessionId) throw new Error("No active session");
     if (isTimerPaused) {
-      // startSession(taskId);
       startSubSession(activeSessionId);
-      setIsTimerPaused(false);
       return;
     }
     finishSubSession();
-    setIsTimerPaused(true);
   };
 
   useEffect(() => {
     handleFetchAndSyncTasks();
   }, [store]);
 
-  console.log({ activeSessionId, activeSubSessionId });
   return (
     <TasksContext.Provider
       value={{
@@ -193,7 +224,6 @@ export function TasksProvider(
         activeSubSessionId,
         isTimerPaused,
         setActiveSessionId,
-        setIsTimerPaused,
         setActiveTaskId,
         setActiveSubSessionId,
         updateTask,
@@ -206,7 +236,7 @@ export function TasksProvider(
         getIsActive: () => false,
         toggleIsTaskPaused,
         getTotalSessionsDuration: () => 0,
-        removeSession: () => {},
+        removeSubSession,
         handleFetchAndSyncTasks,
       }}
       {...props}

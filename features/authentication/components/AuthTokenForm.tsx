@@ -3,26 +3,29 @@ import { IInputFieldProps, ToggleSecureTextField } from "@/components/ui/input";
 import { VStack } from "@/components/ui/vstack";
 import { Button } from "@/components/ui/button";
 import { Text } from "@/components/ui/text";
-import { setAuthToken } from "../util/getAuthToken";
 import { useState } from "react";
 import { Link } from "@/components/ui/link";
+import { useAuth } from "../hooks/useAuth";
 
 interface AuthTokenFormProps extends IInputFieldProps {
   onSubmit?: () => void;
+  containerProps?: React.ComponentProps<typeof VStack>;
 }
 
 export function AuthTokenForm({
   onSubmit,
   value,
+  containerProps,
   ...rest
 }: AuthTokenFormProps) {
   const [isSaving, setIsSaving] = useState(false);
+  const { setAuthToken } = useAuth();
 
   const handleSubmit = async () => {
     try {
-      if (!value) throw new Error("Please enter a value");
+      // if (!value) throw new Error("Please enter a value");
       setIsSaving(true);
-      await setAuthToken(value);
+      await setAuthToken(value || "");
       if (onSubmit) onSubmit();
     } catch (error: any) {
       console.log({ error });
@@ -32,7 +35,11 @@ export function AuthTokenForm({
   };
 
   return (
-    <VStack className="h-full flex justify-center" space="xl">
+    <VStack
+      className="h-full flex justify-center"
+      space="xl"
+      {...containerProps}
+    >
       <VStack space="xs">
         <Link href="https://www.todoist.com/help/articles/find-your-api-token-Jpzx9IIlB">
           <Text className="text-info-400">

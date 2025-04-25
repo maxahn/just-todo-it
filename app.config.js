@@ -45,7 +45,7 @@ switch (process.env.CHANNEL) {
       baseUrl: process.env.BASE_URL,
       authApiUrl: process.env.AUTH_API_URL,
       apiUrl: process.env.API_URL,
-      appName: "(Staging) Ray Asset Tracker",
+      appName: `(Staging) ${APP_NAME}`,
       bundleIdentifier: `com.maxapp.${BUNDLE_ID}.staging`,
     };
     break;
@@ -102,6 +102,9 @@ const config = {
       adaptiveIcon: AdaptiveIcon,
       random: "",
       package: routes.bundleIdentifier,
+      androidNavigationBar: {
+        backgroundColor: "#1E293B",
+      },
     },
     web: {
       bundler: "metro",
@@ -113,8 +116,8 @@ const config = {
       [
         "expo-splash-screen",
         {
-          image: "./assets/images/icon.png",
-          imageWidth: 256,
+          image: "./assets/images/splash.png",
+          imageWidth: 390,
           resizeMode: "contain",
           backgroundColor: "#0F172A",
         },

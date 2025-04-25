@@ -18,7 +18,7 @@ export default function Home() {
   }
 
   if (!isLoggedIn) {
-    return <Redirect href="./authenticate" />;
+    return <Redirect href="/tabs/authenticate" />;
   }
 
   return <Redirect href="/tabs/(tabs)/current-task" />;

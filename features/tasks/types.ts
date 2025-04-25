@@ -64,15 +64,25 @@ export type TaskExtra = {
   estimatedDuration: number; // in minutes
   anxietyLevel: number;
   difficulty: number;
+  skip?: boolean;
 };
+
+export type CompletedTask = Task &
+  Session &
+  SubSession & {
+    lastCompletedAt: string;
+    estimatedDuration?: number;
+    durationInSeconds?: number;
+  };
 
 export type TaskExtraUpdate = Partial<TaskExtra>;
 
 export type TaskUpdate = Partial<Omit<Task, "id" | "createdAt">>;
 
 export type Session = {
-  id: string;
   taskId: string;
+  estimatedDuration: number; // in minutes
+  notes?: string;
   // start: string;
   // end?: string;
   // taskCompleted?: boolean;

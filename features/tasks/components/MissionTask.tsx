@@ -14,6 +14,8 @@ import { useTasksAndSessions } from "../hooks/useActiveMission";
 import { useRow } from "tinybase/ui-react";
 import { TASK_EXTRA_TABLE_ID, TASK_TABLE_ID } from "@/store";
 import type { Task, TaskExtra } from "../types";
+import { useEffect } from "react";
+import _ from "lodash";
 
 type MissionTaskProps = {
   id: string;
@@ -29,8 +31,13 @@ export function MissionTask({ id, onDefer }: MissionTaskProps) {
     ? isAfter(dueDate, new Date().setHours(0, 0, 0, 0)) || !isToday(dueDate)
     : false;
 
-  const { isCompleting, completeTask, startTask, updateTaskExtra } =
-    useTasksAndSessions();
+  const {
+    isCompleting,
+    completeTask,
+    setActiveTaskId,
+    startTask,
+    updateTaskExtra,
+  } = useTasksAndSessions();
 
   const handleCompleteTask = async () => {
     try {
@@ -54,8 +61,14 @@ export function MissionTask({ id, onDefer }: MissionTaskProps) {
   };
 
   const handleStartTask = async () => {
-    startTask(id);
+    startTask(id, taskExtra?.estimatedDuration);
   };
+
+  useEffect(() => {
+    if (_.isEmpty(task)) {
+      setActiveTaskId("");
+    }
+  }, [task]);
 
   return (
     <Card className="rounded-xl p-6 gap-4" variant="filled">

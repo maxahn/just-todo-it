@@ -7,7 +7,7 @@ import { HStack } from "@/components/ui/hstack";
 import { ScrollViewScreenWrapper } from "@/components/ui/wrapper/ScreenWrapper";
 import { VStack } from "@/components/ui/vstack";
 import { Redirect } from "expo-router";
-import { useSortedIncompleteTasks } from "@/store/hooks/queries/useTasks";
+import { useSortedIncompleteUnskippedTaskIds } from "@/store/hooks/queries/useTasks";
 import { SUB_SESSION_TABLE_ID } from "@/store";
 import { useRow } from "tinybase/ui-react";
 import _ from "lodash";
@@ -15,7 +15,8 @@ import _ from "lodash";
 export default function CurrentTask() {
   const [deferOffset, setDeferOffset] = useState(0);
   const [todayOnly, setTodayOnly] = useState(true);
-  const sortedIncompleteTaskIds = useSortedIncompleteTasks();
+  const sortedIncompleteUnskippedTaskIds =
+    useSortedIncompleteUnskippedTaskIds();
   const {
     isSyncing,
     handleFetchAndSyncTasks,
@@ -25,13 +26,13 @@ export default function CurrentTask() {
     setActiveTaskId,
   } = useTasksAndSessions();
   const activeSubSession = useRow(SUB_SESSION_TABLE_ID, activeSubSessionId);
-  console.log("activeSubSession", activeSubSession);
 
   function initializeActiveMission() {
-    if (!sortedIncompleteTaskIds?.length || (activeTaskId && activeSessionId)) {
+    const isTimerActive = Boolean(activeTaskId) && Boolean(activeSessionId);
+    if (!sortedIncompleteUnskippedTaskIds?.length || isTimerActive) {
       return;
     }
-    const nextActiveTaskId = sortedIncompleteTaskIds[0 + deferOffset];
+    const nextActiveTaskId = sortedIncompleteUnskippedTaskIds[0 + deferOffset];
     setActiveTaskId(nextActiveTaskId);
   }
 
@@ -42,9 +43,16 @@ export default function CurrentTask() {
   }
 
   useEffect(() => {
-    if (activeTaskId && sortedIncompleteTaskIds.includes(activeTaskId)) return;
+    const sortedListIncludesTaskId =
+      sortedIncompleteUnskippedTaskIds.includes(activeTaskId);
+    // console.log({
+    //   sortedListIncludesTaskId,
+    //   activeTaskId,
+    //   sortedIncompleteUnskippedTaskIds,
+    // });
+    if (activeTaskId && sortedListIncludesTaskId) return;
     initializeActiveMission();
-  }, [sortedIncompleteTaskIds, todayOnly, activeTaskId]);
+  }, [sortedIncompleteUnskippedTaskIds, todayOnly, activeTaskId]);
 
   const handleRefetchTasks = async () => {
     await handleFetchAndSyncTasks;
@@ -52,7 +60,6 @@ export default function CurrentTask() {
   };
 
   if (activeTaskId && !_.isEmpty(activeSubSession)) {
-    console.log("redirecting to timer");
     return <Redirect href="./current-task/timer" />;
   }
 
