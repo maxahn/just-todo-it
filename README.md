@@ -5,8 +5,8 @@ This is a mobile app that pulls tasks from the Todist API, sorts them based on p
 ### Screenshots
 
 <img src="https://i.imgur.com/ZN3n3m0.jpeg" width="256px" height="549px" />
-<img src="https://i.imgur.com/yql76T9.jpeg" width="256px" height="549px" />
-<img src="https://i.imgur.com/Z4Stniq.jpeg" width="256px" height="549px" />
+<img src="https://i.imgur.com/gX1EyGn.jpeg" width="256px" height="549px" />
+<img src="https://i.imgur.com/Z3Xc3p1.jpeg" width="256px" height="549px" />
 <img src="https://i.imgur.com/aQaSK5R.jpeg" width="256px" height="549px" />
 <img src="https://i.imgur.com/rbKeNOO.jpeg" width="256px" height="549px" />
 
