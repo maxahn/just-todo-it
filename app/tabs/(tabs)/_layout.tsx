@@ -17,6 +17,14 @@ export default function TabLayout() {
         // Disable the static render of the header on web
         // to prevent a hydration error in React Navigation v6.
         headerShown: useClientOnlyValue(false, true),
+        headerStyle: {
+          backgroundColor: "#1E293B",
+        },
+        tabBarStyle: {
+          backgroundColor: "#1E293B",
+        },
+        tabBarActiveTintColor: "#6366F1",
+        tabBarInactiveTintColor: "#94A3B8",
       }}
     >
       <Tabs.Screen
@@ -26,17 +34,25 @@ export default function TabLayout() {
           tabBarIcon: ({ color }) => <TabBarIcon name="list" color={color} />,
         }}
       />
-
       <Tabs.Screen
-        name="index"
+        name="current-task"
         options={{
           title: "Current Task",
-          headerShown: false,
           tabBarIcon: ({ color }) => (
             <TabBarIcon name="bullseye" color={color} />
           ),
         }}
       />
+      <Tabs.Screen
+        name="summary/index"
+        options={{
+          title: "Summary",
+          tabBarIcon: ({ color }) => (
+            <TabBarIcon name="bar-chart-o" color={color} />
+          ),
+        }}
+      />
+
       <Tabs.Screen
         name="player"
         options={{

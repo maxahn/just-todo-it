@@ -1,5 +1,5 @@
 "use client";
-import React from "react";
+import React, { useState } from "react";
 import { createInput } from "@gluestack-ui/input";
 import { View, Pressable, TextInput } from "react-native";
 import { tva } from "@gluestack-ui/nativewind-utils/tva";
@@ -10,6 +10,8 @@ import {
 import { cssInterop } from "nativewind";
 import type { VariantProps } from "@gluestack-ui/nativewind-utils";
 import { PrimitiveIcon, UIIcon } from "@gluestack-ui/icon";
+import { EyeIcon } from "../icon";
+import { EyeOffIcon } from "lucide-react-native";
 
 const SCOPE = "INPUT";
 
@@ -182,7 +184,7 @@ const InputSlot = React.forwardRef<
   );
 });
 
-type IInputFieldProps = React.ComponentProps<typeof UIInput.Input> &
+export type IInputFieldProps = React.ComponentProps<typeof UIInput.Input> &
   VariantProps<typeof inputFieldStyle> & { className?: string };
 
 const InputField = React.forwardRef<
@@ -206,9 +208,35 @@ const InputField = React.forwardRef<
   );
 });
 
+export type IToggleSecureTextFieldProps = React.ComponentProps<typeof Input> & {
+  inputFieldProps?: IInputFieldProps;
+  inputSlotProps?: IInputSlotProps;
+  inputIconProps?: IInputIconProps;
+};
+
+const ToggleSecureTextField = React.forwardRef<
+  React.ElementRef<typeof Input>,
+  IToggleSecureTextFieldProps
+>(({ inputFieldProps, inputSlotProps, inputIconProps, ...rest }, ref) => {
+  const [showInput, setShowInput] = useState(false);
+  return (
+    <Input ref={ref} {...rest}>
+      <InputField type={showInput ? "text" : "password"} {...inputFieldProps} />
+      <InputSlot
+        className="pr-3"
+        onPress={() => setShowInput((showInput) => !showInput)}
+        {...inputSlotProps}
+      >
+        <InputIcon as={showInput ? EyeIcon : EyeOffIcon} {...inputIconProps} />
+      </InputSlot>
+    </Input>
+  );
+});
+
 Input.displayName = "Input";
 InputIcon.displayName = "InputIcon";
 InputSlot.displayName = "InputSlot";
 InputField.displayName = "InputField";
+ToggleSecureTextField.displayName = "ToggleSecureTextField";
 
-export { Input, InputField, InputIcon, InputSlot };
+export { Input, InputField, InputIcon, InputSlot, ToggleSecureTextField };

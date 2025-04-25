@@ -1,20 +1,58 @@
 {
   "cli": {
-    "version": ">= 10.2.1"
+    "version": ">= 15.0.13"
   },
   "build": {
+    "defaults": {
+      "node": "21.7.0"
+    },
     "development": {
       "developmentClient": true,
-      "distribution": "internal"
-    },
-    "preview": {
       "distribution": "internal",
-      "channel": "preview",
-      "android": {
-        "buildType": "apk"
+      "channel": "development",
+      "ios": {
+        "simulator": true
+      },
+      "env": {
+        "CHANNEL": "development"
       }
     },
-    "production": {}
+    "develop-staging": {
+      "extends": "defaults",
+      "distribution": "internal",
+      "environment": "development",
+      "channel": "develop-staging",
+      "env": {
+        "CHANNEL": "develop-staging"
+      }
+    },
+    "staging": {
+      "extends": "defaults",
+      "distribution": "internal",
+      "environment": "development",
+      "channel": "staging",
+      "env": {
+        "CHANNEL": "staging"
+      }
+    },
+    "preview": {
+      "extends": "defaults",
+      "distribution": "store",
+      "environment": "preview",
+      "channel": "preview",
+      "env": {
+        "CHANNEL": "preview"
+      }
+    },
+    "production": {
+      "extends": "defaults",
+      "distribution": "store",
+      "environment": "production",
+      "channel": "production",
+      "env": {
+        "CHANNEL": "production"
+      }
+    }
   },
   "submit": {
     "production": {}

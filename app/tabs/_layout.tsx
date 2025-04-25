@@ -12,8 +12,18 @@ import { Stack } from "expo-router";
 
 export default function AppLayout() {
   return (
-    <Stack>
-      <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
+    <Stack
+      screenOptions={{
+        navigationBarColor: "#1E293B",
+      }}
+    >
+      <Stack.Screen
+        name="(tabs)"
+        options={{
+          headerShown: false,
+        }}
+      />
+      <Stack.Screen name="authenticate" options={{ headerShown: false }} />
     </Stack>
   );
 }

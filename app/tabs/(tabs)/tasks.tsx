@@ -1,40 +1,40 @@
-import React, { useEffect } from "react";
-import { FlatList } from "react-native";
-import { Center } from "@/components/ui/center";
-import { Text } from "@/components/ui/text";
-import useTasksQuery from "@/app/features/tasks/hooks/useTasksQuery";
-import { Spinner } from "@/components/ui/spinner";
-import { sortByDueDateAndPriority } from "@/app/features/tasks/utils/sortTasks";
-import { Card } from "@/components/ui/card";
+import { FlatList, RefreshControl } from "react-native";
+import { Box } from "@/components/ui/box";
+import { useTasksAndSessions } from "@/features/tasks/hooks/useActiveMission";
+import { useRouter } from "expo-router";
+import { TaskCard } from "@/features/tasks/components/TaskCard";
+import { useSortedIncompleteTaskIds } from "@/store/hooks/queries/useTasks";
+import { ScreenWrapper } from "@/components/ui/wrapper/ScreenWrapper";
 
-export default function Home() {
-  const { data: tasks, isLoading } = useTasksQuery();
+export default function TasksListScreen() {
+  const sortedTaskIds = useSortedIncompleteTaskIds();
 
-  const sortedTasks = sortByDueDateAndPriority(tasks || []);
+  const { setActiveTaskId, isSyncing, handleFetchAndSyncTasks } =
+    useTasksAndSessions();
+  const router = useRouter();
+
+  const handleSetActiveTask = (id: string) => {
+    setActiveTaskId(id);
+    router.push("/");
+  };
 
   return (
-    <Center className="flex-1">
-      {isLoading ? (
-        <Spinner />
-      ) : (
-        <FlatList
-          style={{ width: "100%" }}
-          data={sortedTasks}
-          renderItem={({ item: task }) => (
-            <Card key={task.id}>
-              <Text>{task.content}</Text>
-              <Text>{task.due?.date || ""}</Text>
-              <Text>{task.priority || ""}</Text>
-              <Text>
-                Duration:{" "}
-                {task.duration
-                  ? `${task.duration.amount}${task.duration.unit}`
-                  : "None"}
-              </Text>
-            </Card>
-          )}
-        />
-      )}
-    </Center>
+    <ScreenWrapper containerClassName="p-0">
+      <FlatList
+        style={{ width: "100%" }}
+        data={sortedTaskIds}
+        ItemSeparatorComponent={() => <Box className="h-2" />}
+        contentContainerClassName="p-4"
+        refreshControl={
+          <RefreshControl
+            refreshing={isSyncing}
+            onRefresh={handleFetchAndSyncTasks}
+          />
+        }
+        renderItem={({ item: id }) => (
+          <TaskCard id={id} onPressAction={() => handleSetActiveTask(id)} />
+        )}
+      />
+    </ScreenWrapper>
   );
 }

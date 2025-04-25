@@ -1,4 +1,5 @@
 import FontAwesome from "@expo/vector-icons/FontAwesome";
+import { StatusBar } from "expo-status-bar";
 import {
   DarkTheme,
   DefaultTheme,
@@ -7,12 +8,18 @@ import {
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { useFonts } from "expo-font";
 import * as SplashScreen from "expo-splash-screen";
-import { useEffect, useState } from "react";
+import { useEffect, useLayoutEffect, useState } from "react";
 import { GluestackUIProvider } from "@/components/ui/gluestack-ui-provider";
 import { useColorScheme } from "@/components/useColorScheme";
 import { Slot } from "expo-router";
+import { Provider as TinyBaseProvider } from "tinybase/ui-react";
 
 import "../global.css";
+import AuthProvider from "../features/authentication/contexts/AuthProvider";
+import { store } from "@/store";
+import { queries } from "@/store/queries";
+import { useAndStartPersister } from "@/store/hooks/useAndStartPersister";
+import { TasksProvider } from "@/features/tasks/contexts/TasksContext";
 
 const queryClient = new QueryClient();
 export {
@@ -46,13 +53,13 @@ export default function RootLayout() {
     }
   }, [loaded]);
 
-  // useLayoutEffect(() => {
-  //   setStyleLoaded(true);
-  // }, [styleLoaded]);
+  useLayoutEffect(() => {
+    setStyleLoaded(true);
+  }, [styleLoaded]);
 
-  // if (!loaded || !styleLoaded) {
-  //   return null;
-  // }
+  if (!loaded || !styleLoaded) {
+    return null;
+  }
 
   return <RootLayoutNav />;
 }
@@ -60,15 +67,24 @@ export default function RootLayout() {
 function RootLayoutNav() {
   const colorScheme = useColorScheme();
 
+  useAndStartPersister(store);
+
   return (
-    <QueryClientProvider client={queryClient}>
-      <GluestackUIProvider mode={"dark"}>
-        <ThemeProvider
-          value={colorScheme === "dark" ? DarkTheme : DefaultTheme}
-        >
-          <Slot />
-        </ThemeProvider>
-      </GluestackUIProvider>
-    </QueryClientProvider>
+    <AuthProvider>
+      <TinyBaseProvider store={store} queries={queries}>
+        <QueryClientProvider client={queryClient}>
+          <TasksProvider>
+            <GluestackUIProvider mode={"dark"}>
+              <ThemeProvider
+                value={colorScheme === "dark" ? DarkTheme : DefaultTheme}
+              >
+                <StatusBar style={colorScheme === "dark" ? "light" : "dark"} />
+                <Slot />
+              </ThemeProvider>
+            </GluestackUIProvider>
+          </TasksProvider>
+        </QueryClientProvider>
+      </TinyBaseProvider>
+    </AuthProvider>
   );
 }

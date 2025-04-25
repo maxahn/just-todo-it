@@ -145,6 +145,7 @@ module.exports = {
         background: {
           0: "rgb(var(--color-background-0)/<alpha-value>)",
           50: "rgb(var(--color-background-50)/<alpha-value>)",
+          60: "rgb(var(--color-background-60)/<alpha-value>)",
           100: "rgb(var(--color-background-100)/<alpha-value>)",
           200: "rgb(var(--color-background-200)/<alpha-value>)",
           300: "rgb(var(--color-background-300)/<alpha-value>)",
