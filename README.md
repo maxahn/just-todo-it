@@ -1,6 +1,9 @@
 # Just TODO It (Placeholder name? Idk I like it)
 
 This is a mobile app that pulls tasks from the Todist API, sorts them based on priority and due date and presents one task a time for the user to complete. The idea is to not think, just do. When you want to start a task, you estimate how long you think the task will take, start the task and try and beat the time. There are a bunch of future features I'd like to implement which are outlined below but for now, this is the basic functionality of the app.
+
+### Screenshots
+
 <img src="https://i.imgur.com/ZN3n3m0.jpeg" width="256px" height="549px" />
 <img src="https://i.imgur.com/yql76T9.jpeg" width="256px" height="549px" />
 <img src="https://i.imgur.com/Z4Stniq.jpeg" width="256px" height="549px" />
